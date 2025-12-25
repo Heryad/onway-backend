@@ -6,7 +6,7 @@ import { cities } from "./cities";
 /**
  * Admin Roles Enum
  */
-export const adminRoles = ["owner", "country_admin", "city_admin", "finance", "support"] as const;
+export const adminRoles = ["owner", "country_admin", "city_admin", "finance", "support", "operator"] as const;
 export type AdminRole = (typeof adminRoles)[number];
 
 /**
