@@ -145,7 +145,8 @@ export class StoryService {
 
     static async cleanupExpired(): Promise<number> {
         const result = await db.delete(stories)
-            .where(lte(stories.expiresAt, new Date()));
-        return 0; // Would return count in real implementation
+            .where(lte(stories.expiresAt, new Date()))
+            .returning({ id: stories.id });
+        return result.length;
     }
 }

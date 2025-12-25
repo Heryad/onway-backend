@@ -104,6 +104,11 @@
 - [Notifications](#notifications)
   - [Send](#post-send)
   - [Broadcast](#post-broadcast)
+- [Audit Logs](#audit-logs)
+  - [List Logs](#get---20)
+  - [Get Log](#get-id--20)
+  - [Record History](#get-recordtablerecordid)
+  - [Admin Activity](#get-adminadminid)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1783,6 +1788,46 @@ Broadcast to multiple users.
 ```
 
 **Targeting:** `userIds` (specific) or `cityId`/`countryId` (geo).
+
+---
+
+## Audit Logs
+
+**Base URL:** `/api/v1/admin/audit-logs`
+
+**Access:** `owner` only
+
+---
+
+### GET `/` 🔒
+
+List audit logs.
+
+**Query Params:** `actorType`, `actorId`, `action`, `tableName`, `recordId`, `dateFrom`, `dateTo`.
+
+**Actor Types:** `admin`, `user`, `driver`, `store`, `system`.
+
+**Action Types:** `create`, `update`, `delete`, `login`, `logout`, `password_change`, `status_change`, `payment`, `refund`, `assign`, `export`.
+
+---
+
+### GET `/:id` 🔒
+
+Get audit log details.
+
+---
+
+### GET `/record/:table/:recordId` 🔒
+
+Get audit history for a specific record.
+
+Example: `/record/orders/uuid` - Get all changes to an order.
+
+---
+
+### GET `/admin/:adminId` 🔒
+
+Get activity log for a specific admin.
 
 ---
 

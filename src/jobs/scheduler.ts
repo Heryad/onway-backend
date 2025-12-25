@@ -34,6 +34,20 @@ export const initScheduler = async () => {
         );
         logger.info('Scheduled Driver Payouts (Mon 03:00)');
 
+        // Cleanup Expired Stories - Daily at 04:00 AM
+        const { systemQueue } = await import('./queues');
+        await systemQueue.add(
+            JOB_NAMES.CLEANUP_EXPIRED_STORIES,
+            {},
+            {
+                repeat: {
+                    pattern: '0 4 * * *', // Daily at 04:00
+                },
+                jobId: 'recurring-cleanup-stories',
+            }
+        );
+        logger.info('Scheduled Story Cleanup (Daily 04:00)');
+
     } catch (error) {
         logger.error({ error }, 'Failed to initialize scheduler');
         // Do not crash the app, just log

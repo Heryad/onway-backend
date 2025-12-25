@@ -37,3 +37,18 @@ export const dispatchQueue = new Queue(QUEUE_NAMES.DISPATCH, {
         },
     },
 });
+
+export const systemQueue = new Queue(QUEUE_NAMES.SYSTEM, {
+    connection: redisConnection,
+    defaultJobOptions: {
+        attempts: 3,
+        backoff: {
+            type: 'exponential',
+            delay: 1000,
+        },
+        removeOnComplete: true,
+        removeOnFail: {
+            count: 100,
+        },
+    },
+});

@@ -1,6 +1,7 @@
 export const QUEUE_NAMES = {
     PAYOUTS: 'payouts',
     DISPATCH: 'dispatch',
+    SYSTEM: 'system',
 } as const;
 
 export const JOB_NAMES = {
@@ -8,6 +9,7 @@ export const JOB_NAMES = {
     GENERATE_DRIVER_PAYOUTS: 'generate-driver-payouts',
     FIND_DRIVER: 'find-driver',
     DRIVER_RESPONSE_TIMEOUT: 'driver-response-timeout',
+    CLEANUP_EXPIRED_STORIES: 'cleanup-expired-stories',
 } as const;
 
 export interface PayoutJobData {

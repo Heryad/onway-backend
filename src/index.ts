@@ -9,6 +9,7 @@ import { routes } from './routes';
 import { initScheduler } from './jobs/scheduler';
 import './jobs/workers/payout.worker';
 import './jobs/workers/dispatch.worker';
+import './jobs/workers/system.worker';
 import { createServer } from 'http';
 import { initSocketServer } from './sockets';
 
