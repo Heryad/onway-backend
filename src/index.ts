@@ -6,6 +6,8 @@ import { config } from './config';
 import { ApiResponse, logger, HealthService } from './lib';
 import { httpLoggerMiddleware } from './middleware';
 import { routes } from './routes';
+import { initScheduler } from './jobs/scheduler';
+import './jobs/workers/payout.worker';
 
 // Initialize Hono app
 const app = new Hono();
@@ -63,6 +65,11 @@ app.onError((err, c) => {
 
 // Start server
 logger.info(`🚀 Server starting on port ${config.PORT}...`);
+
+// Initialize Background Jobs
+initScheduler().catch(err => {
+    logger.error({ err }, 'Failed to initialize job scheduler');
+});
 
 export default {
     port: config.PORT,
