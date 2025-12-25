@@ -18,6 +18,24 @@
   - [Update Admin](#put-id-)
   - [Delete Admin](#delete-id-)
   - [Toggle Status](#patch-idtoggle-status-)
+- [Countries](#countries)
+  - [List Countries](#get---1)
+  - [Get Country](#get-id--1)
+  - [Create Country](#post---1)
+  - [Update Country](#put-id--1)
+  - [Delete Country](#delete-id--1)
+- [Cities](#cities)
+  - [List Cities](#get---2)
+  - [Get City](#get-id--2)
+  - [Create City](#post---2)
+  - [Update City](#put-id--2)
+  - [Delete City](#delete-id--2)
+- [City Zones](#city-zones)
+  - [List Zones](#get---3)
+  - [Get Zone](#get-id--3)
+  - [Create Zone](#post---3)
+  - [Update Zone](#put-id--3)
+  - [Delete Zone](#delete-id--3)
 - [Roles & Permissions](#roles--permissions)
 - [Error Codes](#error-codes)
 
@@ -385,6 +403,298 @@ Toggle admin active status.
   "timestamp": "2025-12-25T12:00:00.000Z"
 }
 ```
+
+---
+
+## Countries
+
+**Base URL:** `/api/v1/admin/countries`
+
+**Access:** `owner` only (countries are global)
+
+---
+
+### GET `/` 🔒
+
+List all countries.
+
+**Query Parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| search | string | Search by name |
+| isActive | boolean | Filter by status |
+| page | number | Page (default: 1) |
+| limit | number | Per page (default: 50) |
+| sortOrder | string | `asc`, `desc` |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Success",
+  "data": [
+    {
+      "id": "660e8400-e29b-41d4-a716-446655440000",
+      "name": { "en": "UAE", "ar": "الإمارات" },
+      "phoneCode": "+971",
+      "currency": "Dirham",
+      "currencyCode": "AED",
+      "currencySymbol": "د.إ",
+      "avatar": "https://example.com/uae.png",
+      "isActive": true
+    }
+  ],
+  "meta": { "page": 1, "limit": 50, "total": 5 }
+}
+```
+
+---
+
+### GET `/:id` 🔒
+
+Get country by ID.
+
+---
+
+### POST `/` 🔒
+
+Create country.
+
+**Request:**
+```json
+{
+  "name": { "en": "UAE", "ar": "الإمارات" },
+  "phoneCode": "+971",
+  "currency": "Dirham",
+  "currencyCode": "AED",
+  "currencySymbol": "د.إ",
+  "avatar": "https://example.com/uae.png"
+}
+```
+
+**Validation:**
+
+| Field | Rules |
+|-------|-------|
+| name | Required, object with language keys |
+| phoneCode | Required, max 10 chars |
+| currency | Required, max 50 chars |
+| currencyCode | Required, max 10 chars |
+| currencySymbol | Required, max 10 chars |
+| avatar | Optional, URL |
+
+---
+
+### PUT `/:id` 🔒
+
+Update country. All fields optional.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete country.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle country active status.
+
+---
+
+## Cities
+
+**Base URL:** `/api/v1/admin/cities`
+
+**Access:** `owner`, `country_admin` (filtered by their country)
+
+---
+
+### GET `/` 🔒
+
+List cities.
+
+**Query Parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| countryId | uuid | Filter by country |
+| search | string | Search by name |
+| isActive | boolean | Filter by status |
+| page | number | Page (default: 1) |
+| limit | number | Per page (default: 50) |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "770e8400-e29b-41d4-a716-446655440000",
+      "name": { "en": "Dubai", "ar": "دبي" },
+      "countryId": "660e8400-e29b-41d4-a716-446655440000",
+      "baseDeliveryFee": "10.00",
+      "primeDeliveryFee": "5.00",
+      "freeDeliveryThreshold": "100.00",
+      "serviceFee": "2.00",
+      "taxRate": "5.00",
+      "timezone": "Asia/Dubai",
+      "isActive": true,
+      "country": { "id": "...", "name": { "en": "UAE" } }
+    }
+  ]
+}
+```
+
+---
+
+### GET `/:id` 🔒
+
+Get city by ID.
+
+---
+
+### POST `/` 🔒
+
+Create city.
+
+**Request:**
+```json
+{
+  "name": { "en": "Dubai", "ar": "دبي" },
+  "countryId": "660e8400-e29b-41d4-a716-446655440000",
+  "baseDeliveryFee": "10.00",
+  "primeDeliveryFee": "5.00",
+  "freeDeliveryThreshold": "100.00",
+  "serviceFee": "2.00",
+  "taxRate": "5.00",
+  "timezone": "Asia/Dubai",
+  "geoBounds": [[25.0, 55.0], [25.3, 55.3], [25.1, 55.1]]
+}
+```
+
+**Validation:**
+
+| Field | Rules |
+|-------|-------|
+| name | Required, object with language keys |
+| countryId | Required, UUID |
+| baseDeliveryFee | Optional, decimal string |
+| primeDeliveryFee | Optional, decimal string |
+| serviceFee | Optional, decimal string |
+| taxRate | Optional, decimal string (percentage) |
+| timezone | Optional, string |
+| geoBounds | Optional, array of [lat, lng] coordinates |
+
+---
+
+### PUT `/:id` 🔒
+
+Update city. All fields optional except `countryId` cannot be changed.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete city.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle city active status.
+
+---
+
+## City Zones
+
+**Base URL:** `/api/v1/admin/city-zones`
+
+**Access:** `owner`, `country_admin`, `city_admin` (filtered by their city)
+
+---
+
+### GET `/` 🔒
+
+List city zones.
+
+**Query Parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cityId | uuid | Filter by city (required for non-owners) |
+| isActive | boolean | Filter by status |
+| page | number | Page (default: 1) |
+| limit | number | Per page (default: 50) |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "880e8400-e29b-41d4-a716-446655440000",
+      "name": "Marina Area",
+      "cityId": "770e8400-e29b-41d4-a716-446655440000",
+      "extraDeliveryFee": "5.00",
+      "geoPolygon": [[25.0, 55.0], [25.1, 55.1], [25.0, 55.1]],
+      "isActive": true,
+      "city": { "id": "...", "name": { "en": "Dubai" } }
+    }
+  ]
+}
+```
+
+---
+
+### GET `/:id` 🔒
+
+Get zone by ID.
+
+---
+
+### POST `/` 🔒
+
+Create city zone.
+
+**Request:**
+```json
+{
+  "name": "Marina Area",
+  "cityId": "770e8400-e29b-41d4-a716-446655440000",
+  "extraDeliveryFee": "5.00",
+  "geoPolygon": [[25.0, 55.0], [25.1, 55.1], [25.0, 55.1]]
+}
+```
+
+**Validation:**
+
+| Field | Rules |
+|-------|-------|
+| name | Required, max 255 chars |
+| cityId | Required, UUID |
+| extraDeliveryFee | Optional, decimal string |
+| geoPolygon | Required, array of min 3 [lat, lng] coordinates |
+
+---
+
+### PUT `/:id` 🔒
+
+Update zone. All fields optional except `cityId` cannot be changed.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete zone.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle zone active status.
 
 ---
 
