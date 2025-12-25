@@ -79,6 +79,11 @@
   - [Update Status](#patch-idstatus-2)
   - [Assign Admin](#patch-idassign)
   - [Reply to Ticket](#post-idmessages)
+- [Reviews](#reviews)
+  - [List Reviews](#get---16)
+  - [Approve Review](#patch-idapprove)
+  - [Reject Review](#patch-idreject)
+  - [Delete Review](#delete-id--16)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1453,6 +1458,59 @@ Reply to ticket.
   "type": "text"
 }
 ```
+
+---
+
+## Reviews
+
+**Base URL:** `/api/v1/admin/reviews`
+
+**Access:** `owner`, `city_admin` (geo filtered)
+
+---
+
+### GET `/pending-count` 🔒
+
+Get count of pending reviews.
+
+---
+
+### GET `/` 🔒
+
+List reviews.
+
+**Query Params:** `type` (store/driver/support), `status`, `rating`, `storeId`, `driverId`.
+
+---
+
+### GET `/:id` 🔒
+
+Get review details.
+
+---
+
+### PATCH `/:id/approve` 🔒
+
+Approve review. Updates store/driver rating.
+
+---
+
+### PATCH `/:id/reject` 🔒
+
+Reject review with reason.
+
+**Request:**
+```json
+{
+  "reason": "Contains inappropriate content"
+}
+```
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete review. Updates store/driver rating.
 
 ---
 
