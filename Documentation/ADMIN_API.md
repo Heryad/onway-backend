@@ -64,6 +64,15 @@
   - [Cancel Order](#post-idcancel)
   - [Assign Driver](#post-idassign-driver)
   - [Initiate Refund](#post-idrefund)
+- [Promo Codes](#promo-codes)
+  - [List Promo Codes](#get---13)
+  - [Create Promo Code](#post---13)
+  - [Update Promo Code](#put-id--13)
+  - [Toggle Status](#patch-idtoggle-status-3)
+- [Promotions](#promotions)
+  - [List Promotions](#get---14)
+  - [Create Promotion](#post---14)
+  - [Manage Stores](#post-idstores)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1189,6 +1198,155 @@ Initiate refund.
   "amount": "25.00"
 }
 ```
+
+---
+
+## Promo Codes
+
+**Base URL:** `/api/v1/admin/promo-codes`
+
+**Access:** `owner`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List promo codes.
+
+**Query Params:** `cityId`, `isActive`, `discountType`, `expired`, `search`.
+
+---
+
+### GET `/:id` 🔒
+
+Get promo code details.
+
+---
+
+### POST `/` 🔒
+
+Create promo code.
+
+**Request:**
+```json
+{
+  "title": "Summer Sale",
+  "code": "SUMMER20",
+  "discountType": "percent",
+  "discountAmount": "20.00",
+  "maxDiscountAmount": "50.00",
+  "maxUses": 1000,
+  "maxUsesPerUser": 1,
+  "minOrderAmount": "30.00",
+  "firstOrderOnly": false,
+  "startsAt": "2025-06-01",
+  "expiresAt": "2025-08-31",
+  "cityId": "..."
+}
+```
+
+---
+
+### PUT `/:id` 🔒
+
+Update promo code.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete promo code.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Enable/Disable promo code.
+
+---
+
+## Promotions
+
+**Base URL:** `/api/v1/admin/promotions`
+
+**Access:** `owner`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List promotions.
+
+**Query Params:** `cityId`, `isActive`, `hasMainView`.
+
+---
+
+### GET `/:id` 🔒
+
+Get promotion details.
+
+---
+
+### POST `/` 🔒
+
+Create promotion.
+
+**Request:**
+```json
+{
+  "title": "Free Delivery Week",
+  "discountType": "free_delivery",
+  "discountAmount": "0",
+  "hasMainView": true,
+  "thumbnail": "...",
+  "startsAt": "2025-01-01",
+  "expiresAt": "2025-01-07"
+}
+```
+
+---
+
+### PUT `/:id` 🔒
+
+Update promotion.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete promotion.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Enable/Disable promotion.
+
+---
+
+### GET `/:id/stores` 🔒
+
+Get stores linked to promotion.
+
+---
+
+### POST `/:id/stores` 🔒
+
+Add store to promotion.
+
+**Request:**
+```json
+{
+  "storeId": "...",
+  "sorting": 0
+}
+```
+
+---
+
+### DELETE `/:id/stores/:storeId` 🔒
+
+Remove store from promotion.
 
 ---
 
