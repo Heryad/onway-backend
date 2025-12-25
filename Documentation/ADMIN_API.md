@@ -85,6 +85,16 @@
   - [Preview Stats](#get-statspreview)
   - [Generate Payout](#post-generate)
   - [Process Payout](#patch-idprocess)
+- [Drivers](#drivers)
+  - [List Drivers](#get---9)
+  - [Create Driver](#post---9)
+  - [Update Driver](#put-id--11)
+  - [Toggle Status](#patch-idtoggle-status-1)
+  - [Reset Password](#post-idreset-password-1)
+- [Driver Payouts](#driver-payouts)
+  - [List Payouts](#get---10)
+  - [Generate Payout](#post-generate-1)
+  - [Process Payout](#patch-idprocess-1)
 - [Roles & Permissions](#roles--permissions)
 - [Error Codes](#error-codes)
 
@@ -1640,6 +1650,109 @@ Mark as Paid or Failed.
   "failureReason": "Bank account invalid"
 }
 ```
+
+---
+
+## Drivers
+
+**Base URL:** `/api/v1/admin/drivers`
+
+**Access:** `owner`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List drivers.
+
+**Query Params:** `cityId`, `vehicleType`, `isOnline` (bool), `search` (string).
+
+---
+
+### POST `/` 🔒
+
+Create driver.
+
+**Request:**
+```json
+{
+  "username": "John Doe",
+  "email": "john@driver.com",
+  "phone": "+1234567890",
+  "password": "password123",
+  "vehicleType": "bike",
+  "cityId": "...",
+  "countryId": "..."
+}
+```
+
+---
+
+### PUT `/:id` 🔒
+
+Update driver.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle active status.
+
+---
+
+### POST `/:id/reset-password` 🔒
+
+Reset driver password.
+
+**Request:**
+```json
+{
+  "password": "newpassword123"
+}
+```
+
+---
+
+## Driver Payouts
+
+**Base URL:** `/api/v1/admin/driver-payouts`
+
+**Access:** `owner`, `finance`
+
+---
+
+### GET `/` 🔒
+
+List payouts.
+
+**Query Params:** `driverId`, `status`, `periodStart` (YYYY-MM-DD), `periodEnd`.
+
+---
+
+### GET `/stats/preview` 🔒
+
+Preview calculations.
+
+---
+
+### POST `/generate` 🔒
+
+Manual generation.
+
+**Request:**
+```json
+{
+  "driverId": "...",
+  "periodStart": "2025-01-01",
+  "periodEnd": "2025-01-07"
+}
+```
+
+---
+
+### PATCH `/:id/process` 🔒
+
+Mark as Paid or Failed.
 
 ---
 

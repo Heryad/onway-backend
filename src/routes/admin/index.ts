@@ -13,6 +13,8 @@ import { storeMenuCategoryRoutes } from './store-menu-category.routes';
 import { storeItemRoutes } from './store-item.routes';
 import { storeItemAddonRoutes } from './store-item-addon.routes';
 import { storePayoutRoutes } from './store-payout.routes';
+import { driverRoutes } from './driver.routes';
+import { driverPayoutRoutes } from './driver-payout.routes';
 
 const adminRoutes = new Hono();
 
@@ -39,7 +41,11 @@ adminRoutes.route('/store-menu', storeMenuCategoryRoutes);
 adminRoutes.route('/store-items', storeItemRoutes);
 adminRoutes.route('/store-addons', storeItemAddonRoutes);
 
+// Drivers
+adminRoutes.route('/drivers', driverRoutes);
+
 // Financials
 adminRoutes.route('/store-payouts', storePayoutRoutes);
+adminRoutes.route('/driver-payouts', driverPayoutRoutes);
 
 export { adminRoutes };
