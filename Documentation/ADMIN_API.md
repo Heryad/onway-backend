@@ -51,6 +51,12 @@
   - [Create Banner](#post---6)
   - [Update Banner](#put-id--6)
   - [Delete Banner](#delete-id--6)
+- [Users](#users)
+  - [List Users](#get---11)
+  - [Get User](#get-id--11)
+  - [Update User](#put-id--11)
+  - [Toggle Status](#patch-idtoggle-status-2)
+  - [Get Addresses](#get-idaddresses)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1032,6 +1038,55 @@ Delete banner.
 ### PATCH `/:id/toggle-status` 🔒
 
 Toggle banner status.
+
+---
+
+## Users
+
+**Base URL:** `/api/v1/admin/users`
+
+**Access:** `owner`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List users.
+
+**Query Params:** `cityId`, `countryId`, `isPrime` (bool), `isActive`, `search` (name/email/phone).
+
+---
+
+### GET `/:id` 🔒
+
+Get user details.
+
+---
+
+### PUT `/:id` 🔒
+
+Update user.
+
+**Request:**
+```json
+{
+  "isActive": false,
+  "isPrime": true,
+  "email": "..."
+}
+```
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle active status (Ban/Unban).
+
+---
+
+### GET `/:id/addresses` 🔒
+
+Get user saved addresses.
 
 ---
 

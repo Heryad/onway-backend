@@ -15,6 +15,7 @@ import { storeItemAddonRoutes } from './store-item-addon.routes';
 import { storePayoutRoutes } from './store-payout.routes';
 import { driverRoutes } from './driver.routes';
 import { driverPayoutRoutes } from './driver-payout.routes';
+import { userRoutes } from './user.routes';
 
 const adminRoutes = new Hono();
 
@@ -33,6 +34,9 @@ adminRoutes.route('/city-zones', cityZoneRoutes);
 adminRoutes.route('/categories', categoryRoutes);
 adminRoutes.route('/sections', sectionRoutes);
 adminRoutes.route('/banners', bannerRoutes);
+
+// Users
+adminRoutes.route('/users', userRoutes);
 
 // Stores
 adminRoutes.route('/stores', storeRoutes);
