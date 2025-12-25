@@ -1,0 +1,70 @@
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { secureHeaders } from 'hono/secure-headers';
+import { prettyJSON } from 'hono/pretty-json';
+import { config } from './config';
+import { ApiResponse, logger, HealthService } from './lib';
+import { httpLoggerMiddleware } from './middleware';
+import { routes } from './routes';
+
+// Initialize Hono app
+const app = new Hono();
+
+// Global middleware
+app.use('*', httpLoggerMiddleware);
+app.use('*', secureHeaders());
+app.use('*', prettyJSON());
+app.use('*', cors({
+    origin: config.CORS_ORIGINS.split(','),
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+}));
+
+// Readiness/Health check (full - checks all dependencies)
+app.get('/health', async (c) => {
+    const health = await HealthService.check();
+    const statusCode = health.status === 'healthy' ? 200 : health.status === 'degraded' ? 200 : 503;
+
+    return c.json({
+        success: health.status !== 'unhealthy',
+        message: `Service is ${health.status}`,
+        data: health,
+        timestamp: health.timestamp,
+    }, statusCode);
+});
+
+// API version info
+app.get('/', (c) => {
+    return ApiResponse.success(c, {
+        message: 'Welcome to Onway API',
+        data: {
+            name: 'onway-backend',
+            version: '1.0.0',
+            apiVersion: config.API_VERSION,
+        },
+    });
+});
+
+// Mount all routes under API prefix (e.g., /api/v1)
+app.route(config.API_PREFIX, routes);
+
+// 404 handler
+app.notFound((c) => {
+    return ApiResponse.notFound(c, `Route ${c.req.method} ${c.req.path} not found`);
+});
+
+// Error handler
+app.onError((err, c) => {
+    logger.error({ err }, 'Unhandled error');
+    const errorMessage = config.NODE_ENV === 'production' ? undefined : err.message;
+    return ApiResponse.internalError(c, 'Something went wrong', errorMessage);
+});
+
+// Start server
+logger.info(`🚀 Server starting on port ${config.PORT}...`);
+
+export default {
+    port: config.PORT,
+    fetch: app.fetch,
+};

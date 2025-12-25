@@ -242,6 +242,7 @@ bun run db:studio
 
 ## 📚 Documentation
 
+- **[Admin API](./ADMIN_API.md)** - Admin authentication & management endpoints
 - **[Infrastructure Setup](./infrastructure/README.md)** - Docker quick start
 - **[Database Guide](./DATABASE_DOCUMENTATION.md)** - All features explained
 
