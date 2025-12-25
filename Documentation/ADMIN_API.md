@@ -84,6 +84,11 @@
   - [Approve Review](#patch-idapprove)
   - [Reject Review](#patch-idreject)
   - [Delete Review](#delete-id--16)
+- [Stories](#stories)
+  - [List Stories](#get---17)
+  - [Create Story](#post---17)
+  - [Update Story](#put-id--17)
+  - [Delete Story](#delete-id--17)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1511,6 +1516,57 @@ Reject review with reason.
 ### DELETE `/:id` 🔒
 
 Delete review. Updates store/driver rating.
+
+---
+
+## Stories
+
+**Base URL:** `/api/v1/admin/stories`
+
+**Access:** `owner`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List stories.
+
+**Query Params:** `storeId`, `adminId`, `expired` (bool), `type` (image/video).
+
+---
+
+### GET `/:id` 🔒
+
+Get story details.
+
+---
+
+### POST `/` 🔒
+
+Create admin story (platform announcement).
+
+**Request:**
+```json
+{
+  "type": "image",
+  "mediaUrl": "https://...",
+  "caption": "New feature launched!",
+  "cityId": "...",
+  "expiresAt": "2025-01-02T00:00:00Z"
+}
+```
+
+---
+
+### PUT `/:id` 🔒
+
+Update story caption or expiry.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete story.
 
 ---
 
