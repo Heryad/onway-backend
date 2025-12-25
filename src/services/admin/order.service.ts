@@ -193,6 +193,18 @@ export class OrderService {
             notes,
         });
 
+        // Notify user about order status change
+        const { NotificationService } = await import('../notification.service');
+        const fullOrder = await this.getById(id);
+        if (fullOrder) {
+            await NotificationService.notifyOrderUpdate(
+                fullOrder.userId,
+                id,
+                fullOrder.orderNumber,
+                newStatus
+            );
+        }
+
         // Trigger driver dispatch when order is accepted
         if (newStatus === 'accepted') {
             const { dispatchQueue } = await import('../../jobs/queues');

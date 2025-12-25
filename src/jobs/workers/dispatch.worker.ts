@@ -225,8 +225,33 @@ async function handleFindDriver(job: Job<DispatchJobData>) {
         { delay: DRIVER_RESPONSE_TIMEOUT_MS }
     );
 
-    // TODO: Emit socket event to notify driver app
-    // socketService.emitToDriver(bestDriver.id, 'new-order', { orderId, ... });
+    // Get order details for notification
+    const order = await db.query.orders.findFirst({
+        where: eq(orders.id, orderId),
+        columns: { id: true, userId: true, orderNumber: true },
+        with: { store: { columns: { name: true } } },
+    });
+
+    if (order) {
+        const { NotificationService } = await import('../../services/notification.service');
+        const { emitToUser } = await import('../../sockets');
+
+        // Notify customer that driver is assigned
+        await NotificationService.notifyDriverAssigned(
+            order.userId,
+            orderId,
+            order.orderNumber,
+            bestDriver.username || 'Your driver'
+        );
+
+        // Notify driver about new order (via Socket)
+        emitToUser(bestDriver.id, 'new-order', {
+            orderId,
+            orderNumber: order.orderNumber,
+            storeName: order.store?.name,
+            storeLocation: location,
+        });
+    }
 
     return { success: true, driverId: bestDriver.id, assignmentId: assignment.id };
 }

@@ -1,5 +1,7 @@
 import { Server as SocketServer } from 'socket.io';
-import type { Server as HTTPServer } from 'http';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createClient } from 'redis';
+import { config } from '../config';
 import { logger } from '../lib/logger';
 
 let io: SocketServer | null = null;
@@ -7,14 +9,29 @@ let io: SocketServer | null = null;
 // Track online users: userId -> Set of socket IDs (user can have multiple devices)
 const onlineUsers = new Map<string, Set<string>>();
 
-export function initSocketServer(httpServer: HTTPServer) {
-    io = new SocketServer(httpServer, {
+export async function initSocketServer(server: any): Promise<SocketServer> {
+    io = new SocketServer(server, {
         cors: {
-            origin: '*', // Configure for production
+            origin: config.CORS_ORIGINS.split(','),
             methods: ['GET', 'POST'],
+            credentials: true,
         },
         path: '/socket.io',
+        transports: ['websocket', 'polling'],
     });
+
+    // Setup Redis adapter for horizontal scaling
+    try {
+        const pubClient = createClient({ url: config.REDIS_URL });
+        const subClient = pubClient.duplicate();
+
+        await Promise.all([pubClient.connect(), subClient.connect()]);
+
+        io.adapter(createAdapter(pubClient, subClient));
+        logger.info('Socket.io Redis adapter connected');
+    } catch (error) {
+        logger.warn({ error }, 'Redis adapter failed, using in-memory adapter');
+    }
 
     io.on('connection', (socket) => {
         logger.info({ socketId: socket.id }, 'Socket connected');

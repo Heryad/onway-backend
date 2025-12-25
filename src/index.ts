@@ -9,6 +9,8 @@ import { routes } from './routes';
 import { initScheduler } from './jobs/scheduler';
 import './jobs/workers/payout.worker';
 import './jobs/workers/dispatch.worker';
+import { createServer } from 'http';
+import { initSocketServer } from './sockets';
 
 // Initialize Hono app
 const app = new Hono();
@@ -72,7 +74,20 @@ initScheduler().catch(err => {
     logger.error({ err }, 'Failed to initialize job scheduler');
 });
 
+// For Socket.io, we use Bun.serve with the http server
+const httpServer = createServer();
+// Initialize Socket.io
+initSocketServer(httpServer).catch(err => {
+    logger.error({ err }, 'Failed to initialize Socket.io');
+});
+
+// Start HTTP server for Socket.io on same port
+httpServer.listen(config.PORT + 1, () => {
+    logger.info(`🔌 Socket.io server on port ${config.PORT + 1}`);
+});
+
 export default {
     port: config.PORT,
     fetch: app.fetch,
 };
+

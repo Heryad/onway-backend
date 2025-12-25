@@ -7,6 +7,7 @@
       "dependencies": {
         "@hono/node-server": "^1.19.7",
         "@hono/zod-validator": "^0.4.1",
+        "@socket.io/redis-adapter": "^8.3.0",
         "argon2": "^0.44.0",
         "bullmq": "^5.66.0",
         "dayjs": "^1.11.19",
@@ -19,6 +20,7 @@
         "pino": "^9.6.0",
         "pino-pretty": "^13.0.0",
         "postgres": "^3.4.7",
+        "redis": "^5.10.0",
         "socket.io": "^4.8.1",
         "typesense": "^2.1.0",
         "zod": "^4.2.1",
@@ -145,7 +147,19 @@
 
     "@pinojs/redact": ["@pinojs/redact@0.4.0", "", {}, "sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg=="],
 
+    "@redis/bloom": ["@redis/bloom@5.10.0", "", { "peerDependencies": { "@redis/client": "^5.10.0" } }, "sha512-doIF37ob+l47n0rkpRNgU8n4iacBlKM9xLiP1LtTZTvz8TloJB8qx/MgvhMhKdYG+CvCY2aPBnN2706izFn/4A=="],
+
+    "@redis/client": ["@redis/client@5.10.0", "", { "dependencies": { "cluster-key-slot": "1.1.2" } }, "sha512-JXmM4XCoso6C75Mr3lhKA3eNxSzkYi3nCzxDIKY+YOszYsJjuKbFgVtguVPbLMOttN4iu2fXoc2BGhdnYhIOxA=="],
+
+    "@redis/json": ["@redis/json@5.10.0", "", { "peerDependencies": { "@redis/client": "^5.10.0" } }, "sha512-B2G8XlOmTPUuZtD44EMGbtoepQG34RCDXLZbjrtON1Djet0t5Ri7/YPXvL9aomXqP8lLTreaprtyLKF4tmXEEA=="],
+
+    "@redis/search": ["@redis/search@5.10.0", "", { "peerDependencies": { "@redis/client": "^5.10.0" } }, "sha512-3SVcPswoSfp2HnmWbAGUzlbUPn7fOohVu2weUQ0S+EMiQi8jwjL+aN2p6V3TI65eNfVsJ8vyPvqWklm6H6esmg=="],
+
+    "@redis/time-series": ["@redis/time-series@5.10.0", "", { "peerDependencies": { "@redis/client": "^5.10.0" } }, "sha512-cPkpddXH5kc/SdRhF0YG0qtjL+noqFT0AcHbQ6axhsPsO7iqPi1cjxgdkE9TNeKiBUUdCaU1DbqkR/LzbzPBhg=="],
+
     "@socket.io/component-emitter": ["@socket.io/component-emitter@3.1.2", "", {}, "sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA=="],
+
+    "@socket.io/redis-adapter": ["@socket.io/redis-adapter@8.3.0", "", { "dependencies": { "debug": "~4.3.1", "notepack.io": "~3.0.1", "uid2": "1.0.0" }, "peerDependencies": { "socket.io-adapter": "^2.5.4" } }, "sha512-ly0cra+48hDmChxmIpnESKrc94LjRL80TEmZVscuQ/WWkRP81nNj8W8cCGMqbI4L6NCuAaPRSzZF1a9GlAxxnA=="],
 
     "@types/bun": ["@types/bun@1.3.4", "", { "dependencies": { "bun-types": "1.3.4" } }, "sha512-EEPTKXHP+zKGPkhRLv+HI0UEX8/o+65hqARxLy8Ov5rIxMBPNTjeZww00CIihrIQGEQBYg+0roO5qOnS/7boGA=="],
 
@@ -469,6 +483,8 @@
 
     "node-gyp-build-optional-packages": ["node-gyp-build-optional-packages@5.2.2", "", { "dependencies": { "detect-libc": "^2.0.1" }, "bin": { "node-gyp-build-optional-packages": "bin.js", "node-gyp-build-optional-packages-optional": "optional.js", "node-gyp-build-optional-packages-test": "build-test.js" } }, "sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw=="],
 
+    "notepack.io": ["notepack.io@3.0.1", "", {}, "sha512-TKC/8zH5pXIAMVQio2TvVDTtPRX+DJPHDqjRbxogtFiByHyzKmy96RA0JtCQJ+WouyyL4A10xomQzgbUT+1jCg=="],
+
     "object-assign": ["object-assign@4.1.1", "", {}, "sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg=="],
 
     "on-exit-leak-free": ["on-exit-leak-free@2.1.2", "", {}, "sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA=="],
@@ -518,6 +534,8 @@
     "readable-stream": ["readable-stream@3.6.2", "", { "dependencies": { "inherits": "^2.0.3", "string_decoder": "^1.1.1", "util-deprecate": "^1.0.1" } }, "sha512-9u/sniCrY3D5WdsERHzHE4G2YCXqoG5FTHUiCC4SIbr6XcLZBY05ya9EKjYek9O5xOAwjGq+1JdGBAS7Q9ScoA=="],
 
     "real-require": ["real-require@0.2.0", "", {}, "sha512-57frrGM/OCTLqLOAh0mhVA9VBMHd+9U7Zb2THMGdBUoZVOtGbJzjxsYGDJ3A9AYYCP4hn6y1TVbaOfzWtm5GFg=="],
+
+    "redis": ["redis@5.10.0", "", { "dependencies": { "@redis/bloom": "5.10.0", "@redis/client": "5.10.0", "@redis/json": "5.10.0", "@redis/search": "5.10.0", "@redis/time-series": "5.10.0" } }, "sha512-0/Y+7IEiTgVGPrLFKy8oAEArSyEJkU0zvgV5xyi9NzNQ+SLZmyFbUsWIbgPcd4UdUh00opXGKlXJwMmsis5Byw=="],
 
     "redis-errors": ["redis-errors@1.2.0", "", {}, "sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w=="],
 
@@ -588,6 +606,8 @@
     "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "typesense": ["typesense@2.1.0", "", { "dependencies": { "axios": "^1.8.4", "loglevel": "^1.8.1", "tslib": "^2.6.2" }, "peerDependencies": { "@babel/runtime": "^7.23.2" } }, "sha512-a/IRTL+dRXlpRDU4UodyGj8hl5xBz3nKihVRd/KfSFAfFPGcpdX6lxIgwdXy3O6VLNNiEsN8YwIsPHQPVT0vNw=="],
+
+    "uid2": ["uid2@1.0.0", "", {}, "sha512-+I6aJUv63YAcY9n4mQreLUt0d4lvwkkopDNmpomkAUz0fAkEMV9pRWxN0EjhW1YfRhcuyHg2v3mwddCDW1+LFQ=="],
 
     "undici-types": ["undici-types@7.16.0", "", {}, "sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw=="],
 

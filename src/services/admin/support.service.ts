@@ -123,6 +123,17 @@ export class SupportService {
             .where(eq(supportTickets.id, id))
             .returning();
 
+        // Notify user about status change
+        if (ticket) {
+            const { NotificationService } = await import('../notification.service');
+            await NotificationService.notifyTicketStatusChange(
+                ticket.userId,
+                id,
+                ticket.ticketNumber,
+                status
+            );
+        }
+
         return ticket ?? null;
     }
 
@@ -206,6 +217,19 @@ export class SupportService {
                 status: sql`CASE WHEN ${supportTickets.status} = 'open' THEN 'in_progress' ELSE ${supportTickets.status} END`,
             })
             .where(eq(supportTickets.id, ticketId));
+
+        // Notify user about admin reply
+        if (senderType === 'admin') {
+            const ticket = await this.getById(ticketId);
+            if (ticket) {
+                const { NotificationService } = await import('../notification.service');
+                await NotificationService.notifySupportReply(
+                    ticket.userId,
+                    ticketId,
+                    ticket.ticketNumber
+                );
+            }
+        }
 
         return message;
     }
