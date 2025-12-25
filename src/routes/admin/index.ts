@@ -7,6 +7,12 @@ import { cityZoneRoutes } from './city-zone.routes';
 import { categoryRoutes } from './category.routes';
 import { sectionRoutes } from './section.routes';
 import { bannerRoutes } from './banner.routes';
+import { storeRoutes } from './store.routes';
+import { storeCategoryAssignmentRoutes } from './store-category-assignment.routes';
+import { storeMenuCategoryRoutes } from './store-menu-category.routes';
+import { storeItemRoutes } from './store-item.routes';
+import { storeItemAddonRoutes } from './store-item-addon.routes';
+import { storePayoutRoutes } from './store-payout.routes';
 
 const adminRoutes = new Hono();
 
@@ -25,5 +31,15 @@ adminRoutes.route('/city-zones', cityZoneRoutes);
 adminRoutes.route('/categories', categoryRoutes);
 adminRoutes.route('/sections', sectionRoutes);
 adminRoutes.route('/banners', bannerRoutes);
+
+// Stores
+adminRoutes.route('/stores', storeRoutes);
+adminRoutes.route('/store-categories', storeCategoryAssignmentRoutes);
+adminRoutes.route('/store-menu', storeMenuCategoryRoutes);
+adminRoutes.route('/store-items', storeItemRoutes);
+adminRoutes.route('/store-addons', storeItemAddonRoutes);
+
+// Financials
+adminRoutes.route('/store-payouts', storePayoutRoutes);
 
 export { adminRoutes };

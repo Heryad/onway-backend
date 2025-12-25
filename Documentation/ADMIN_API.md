@@ -51,6 +51,40 @@
   - [Create Banner](#post---6)
   - [Update Banner](#put-id--6)
   - [Delete Banner](#delete-id--6)
+- [Stores](#stores)
+  - [List Stores](#get---7)
+  - [Get Store](#get-id--7)
+  - [Create Store](#post---7)
+  - [Update Store](#put-id--7)
+  - [Delete Store](#delete-id--7)
+  - [Reset Password](#post-idreset-password-)
+  - [Add Auth User](#post-idauth-users-)
+  - [Remove Auth User](#delete-idauth-usersauthid-)
+- [Store Category Assignments](#store-category-assignments)
+  - [Get Store Categories](#get-storestoreid-)
+  - [Assign Category](#post-storestoreid-)
+  - [Remove Category](#delete-storestoreidcategorycategoryid-)
+  - [Replace All Categories](#put-storestoreid-)
+- [Store Menu Categories](#store-menu-categories)
+  - [List Menu Categories](#get-storestoreid--1)
+  - [Create Menu Category](#post-storestoreid--1)
+  - [Update Menu Category](#put-id--8)
+  - [Delete Menu Category](#delete-id--8)
+- [Store Items](#store-items)
+  - [List Items](#get-storestoreid--2)
+  - [Create Item](#post-storestoreid--2)
+  - [Update Item](#put-id--9)
+  - [Delete Item](#delete-id--9)
+- [Store Item Addons](#store-item-addons)
+  - [List Addons](#get-itemitemid-)
+  - [Create Addon](#post-itemitemid-)
+  - [Update Addon](#put-id--10)
+  - [Delete Addon](#delete-id--10)
+- [Store Payouts](#store-payouts)
+  - [List Payouts](#get---8)
+  - [Preview Stats](#get-statspreview)
+  - [Generate Payout](#post-generate)
+  - [Process Payout](#patch-idprocess)
 - [Roles & Permissions](#roles--permissions)
 - [Error Codes](#error-codes)
 
@@ -988,6 +1022,624 @@ Delete banner.
 ### PATCH `/:id/toggle-status` 🔒
 
 Toggle banner status.
+
+---
+
+## Stores
+
+**Base URL:** `/api/v1/admin/stores`
+
+**Access:** `owner`, `country_admin`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List stores.
+
+**Query Parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cityId | uuid | Filter by city |
+| countryId | uuid | Filter by country |
+| search | string | Search by name |
+| isActive | boolean | Filter by status |
+| isPrime | boolean | Filter prime stores |
+| isSponsored | boolean | Filter sponsored |
+| isFeatured | boolean | Filter featured |
+| page | number | Page (default: 1) |
+| limit | number | Per page (default: 20) |
+| sortBy | string | `createdAt`, `rating`, `sorting` |
+| sortOrder | string | `asc`, `desc` |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "...",
+      "name": { "en": "Pizza Palace", "ar": "قصر البيتزا" },
+      "description": { "en": "Best pizza in town" },
+      "avatar": "https://example.com/logo.png",
+      "thumbnail": "https://example.com/cover.jpg",
+      "rating": "4.8",
+      "totalReviews": 150,
+      "isPrime": true,
+      "isSponsored": false,
+      "isFeatured": true,
+      "isActive": true,
+      "city": { "id": "...", "name": { "en": "Dubai" } },
+      "country": { "id": "...", "name": { "en": "UAE" } }
+    }
+  ]
+}
+```
+
+---
+
+### GET `/:id` 🔒
+
+Get store with auth users.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "...",
+    "name": { "en": "Pizza Palace" },
+    "description": { "en": "Best pizza in town" },
+    "avatar": "https://example.com/logo.png",
+    "thumbnail": "https://example.com/cover.jpg",
+    "thumbnailType": "image",
+    "hasSpecialDeliveryFee": true,
+    "specialDeliveryFee": "5.00",
+    "minOrderAmount": "20.00",
+    "discountType": "percent",
+    "discountAmount": "10.00",
+    "maxDiscountAmount": "50.00",
+    "sorting": 1,
+    "isPrime": true,
+    "isSponsored": false,
+    "isFeatured": true,
+    "workingHours": {
+      "monday": { "open": "09:00", "close": "23:00" },
+      "tuesday": { "open": "09:00", "close": "23:00" }
+    },
+    "preparationTime": 30,
+    "rating": "4.8",
+    "totalReviews": 150,
+    "geoLocation": { "lat": 25.2048, "lng": 55.2708 },
+    "address": "123 Main St, Dubai",
+    "categoryDisplaySetting": "expanded",
+    "canPlaceOrder": true,
+    "acceptsScheduledOrders": true,
+    "commissionRate": "15.00",
+    "cityId": "...",
+    "countryId": "...",
+    "isActive": true,
+    "auth": [
+      {
+        "id": "...",
+        "username": "pizzapalace",
+        "email": "owner@pizzapalace.com",
+        "phone": "+971501234567",
+        "role": "owner",
+        "lastLogin": "2025-12-25T10:00:00Z"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### POST `/` 🔒
+
+Create store with owner credentials.
+
+**Request:**
+```json
+{
+  "name": { "en": "Pizza Palace", "ar": "قصر البيتزا" },
+  "description": { "en": "Best pizza in town" },
+  "avatar": "https://example.com/logo.png",
+  "cityId": "...",
+  "countryId": "...",
+  "auth": {
+    "username": "pizzapalace",
+    "email": "owner@pizzapalace.com",
+    "phone": "+971501234567",
+    "password": "securepassword123"
+  }
+}
+```
+
+**All Fields:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| name | ✅ | Multi-language name |
+| cityId | ✅ | City UUID |
+| countryId | ✅ | Country UUID |
+| auth | ✅ | Owner credentials |
+| description | ❌ | Multi-language description |
+| avatar | ❌ | Logo URL |
+| thumbnail | ❌ | Cover image URL |
+| thumbnailType | ❌ | `image` or `video` |
+| hasSpecialDeliveryFee | ❌ | Override city fee |
+| specialDeliveryFee | ❌ | Custom delivery fee |
+| minOrderAmount | ❌ | Minimum order |
+| discountType | ❌ | `percent` or `fixed` |
+| discountAmount | ❌ | Discount value |
+| maxDiscountAmount | ❌ | Max discount cap |
+| sorting | ❌ | Display order |
+| isPrime | ❌ | Prime store flag |
+| isSponsored | ❌ | Sponsored flag |
+| isFeatured | ❌ | Featured flag |
+| workingHours | ❌ | Hours by day |
+| preparationTime | ❌ | Minutes (default: 30) |
+| geoLocation | ❌ | `{ lat, lng }` |
+| address | ❌ | Street address |
+| commissionRate | ❌ | Platform commission % |
+
+---
+
+### PUT `/:id` 🔒
+
+Update store. All fields optional.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete store.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle store active status.
+
+---
+
+### POST `/:id/reset-password` 🔒
+
+Reset auth user password.
+
+**Request:**
+```json
+{
+  "authId": "...",
+  "newPassword": "newpassword123"
+}
+```
+
+---
+
+### POST `/:id/auth-users` 🔒
+
+Add auth user to store.
+
+**Request:**
+```json
+{
+  "username": "manager1",
+  "email": "manager@pizzapalace.com",
+  "phone": "+971501234568",
+  "password": "securepassword123",
+  "role": "manager"
+}
+```
+
+**Roles:** `owner`, `manager`, `staff`
+
+---
+
+### DELETE `/:id/auth-users/:authId` 🔒
+
+Remove auth user from store.
+
+---
+
+## Store Category Assignments
+
+**Base URL:** `/api/v1/admin/store-categories`
+
+**Access:** `owner`, `country_admin`, `city_admin` (geo filtered)
+
+Manages which platform categories a store belongs to.
+
+---
+
+### GET `/store/:storeId` 🔒
+
+Get all categories assigned to a store.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "...",
+      "storeId": "...",
+      "categoryId": "...",
+      "sorting": 0,
+      "isSponsored": false,
+      "category": {
+        "id": "...",
+        "name": { "en": "Restaurants", "ar": "مطاعم" }
+      }
+    },
+    {
+      "id": "...",
+      "storeId": "...",
+      "categoryId": "...",
+      "sorting": 1,
+      "isSponsored": true,
+      "category": {
+        "id": "...",
+        "name": { "en": "Pizza", "ar": "بيتزا" }
+      }
+    }
+  ]
+}
+```
+
+---
+
+### GET `/category/:categoryId` 🔒
+
+Get all stores in a category.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "...",
+      "storeId": "...",
+      "categoryId": "...",
+      "sorting": 0,
+      "isSponsored": true,
+      "store": {
+        "id": "...",
+        "name": { "en": "Pizza Palace" }
+      }
+    }
+  ]
+}
+```
+
+---
+
+### POST `/store/:storeId` 🔒
+
+Assign a category to store.
+
+**Request:**
+```json
+{
+  "categoryId": "...",
+  "sorting": 0,
+  "isSponsored": false
+}
+```
+
+---
+
+### POST `/store/:storeId/bulk` 🔒
+
+Bulk assign categories (adds to existing).
+
+**Request:**
+```json
+{
+  "categoryIds": ["uuid1", "uuid2", "uuid3"]
+}
+```
+
+---
+
+### PUT `/store/:storeId` 🔒
+
+Replace all categories for a store.
+
+**Request:**
+```json
+{
+  "categoryIds": ["uuid1", "uuid2"]
+}
+```
+
+---
+
+### PATCH `/:assignmentId` 🔒
+
+Update assignment (sorting, sponsored).
+
+**Request:**
+```json
+{
+  "sorting": 1,
+  "isSponsored": true
+}
+```
+
+---
+
+### DELETE `/store/:storeId/category/:categoryId` 🔒
+
+Remove a category from store.
+
+---
+
+## Store Menu Categories
+
+**Base URL:** `/api/v1/admin/store-menu`
+
+**Access:** `owner`, `country_admin`, `city_admin` (geo filtered)
+
+---
+
+### GET `/store/:storeId` 🔒
+
+List menu categories.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "...",
+      "name": { "en": "Burgers" },
+      "sorting": 0
+    }
+  ]
+}
+```
+
+---
+
+### POST `/store/:storeId` 🔒
+
+Create menu category.
+
+**Request:**
+```json
+{
+  "name": { "en": "Burgers" },
+  "description": { "en": "Juicy burgers" },
+  "avatar": "url",
+  "sorting": 0
+}
+```
+
+---
+
+### PUT `/:id` 🔒
+
+Update menu category.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete menu category.
+
+---
+
+### POST `/store/:storeId/reorder` 🔒
+
+Reorder categories.
+
+**Request:**
+```json
+{
+  "categoryIds": ["uuid1", "uuid2"]
+}
+```
+
+---
+
+## Store Items
+
+**Base URL:** `/api/v1/admin/store-items`
+
+**Access:** `owner`, `country_admin`, `city_admin` (geo filtered)
+
+---
+
+### GET `/store/:storeId` 🔒
+
+List items.
+
+**Query Params:** `categoryId` (uuid), `search` (string), `outOfStock` (boolean)
+
+---
+
+### POST `/store/:storeId` 🔒
+
+Create item.
+
+**Request:**
+```json
+{
+  "categoryId": "...",
+  "name": { "en": "Cheeseburger" },
+  "price": "10.00",
+  "photos": ["url1"],
+  "nutritionInfo": { "calories": 500 }
+}
+```
+
+---
+
+### PUT `/:id` 🔒
+
+Update item.
+
+---
+
+### PATCH `/:id/toggle-stock` 🔒
+
+Toggle item stock status.
+
+---
+
+### POST `/bulk-stock` 🔒
+
+Bulk update stock.
+
+**Request:**
+```json
+{
+  "itemIds": ["uuid1", "uuid2"],
+  "outOfStock": true
+}
+```
+
+---
+
+## Store Item Addons
+
+**Base URL:** `/api/v1/admin/store-addons`
+
+**Access:** `owner`, `country_admin`, `city_admin` (geo filtered)
+
+---
+
+### GET `/item/:itemId` 🔒
+
+List addons for an item.
+
+---
+
+### POST `/item/:itemId` 🔒
+
+Create addon.
+
+**Request:**
+```json
+{
+  "name": { "en": "Size" },
+  "options": [
+    { "name": { "en": "Regular" }, "price": 0, "isDefault": true },
+    { "name": { "en": "Large" }, "price": 2 }
+  ],
+  "isRequired": true,
+  "maxSelections": 1
+}
+```
+
+---
+
+### POST `/item/:itemId/duplicate` 🔒
+
+Duplicate addons from one item to another.
+
+**Request:**
+```json
+{
+  "targetItemId": "..."
+}
+```
+
+---
+
+## Store Payouts
+
+**Base URL:** `/api/v1/admin/store-payouts`
+
+**Access:** `owner`, `finance`
+
+---
+
+### GET `/` 🔒
+
+List payouts.
+
+**Query Params:** `storeId`, `status`, `periodStart` (date), `periodEnd` (date).
+
+---
+
+### GET `/stats/preview` 🔒
+
+Get live calculations (Dry Run).
+
+**Query Params:** `storeId`, `periodStart` (YYYY-MM-DD), `periodEnd` (YYYY-MM-DD).
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalOrders": 100,
+    "completedOrders": 95,
+    "cancelledOrders": 5,
+    "grossAmount": 1000.00,
+    "commissionAmount": 150.00,
+    "netAmount": 850.00
+  }
+}
+```
+
+---
+
+### POST `/generate` 🔒
+
+Manual generation (Calculates and saves DB record).
+
+**Request:**
+```json
+{
+  "storeId": "...",
+  "periodStart": "2025-01-01",
+  "periodEnd": "2025-01-07"
+}
+```
+
+---
+
+### POST `/generate-batch` 🔒
+
+Manual batch generation for all active stores (Cron simulation).
+
+**Request:**
+```json
+{
+  "periodStart": "2025-01-01",
+  "periodEnd": "2025-01-07",
+  "confirm": true
+}
+```
+
+---
+
+### PATCH `/:id/process` 🔒
+
+Mark as Paid or Failed.
+
+**Request (Paid):**
+```json
+{
+  "status": "paid",
+  "transactionReference": "tx_12345"
+}
+```
+
+**Request (Failed):**
+```json
+{
+  "status": "failed",
+  "failureReason": "Bank account invalid"
+}
+```
 
 ---
 

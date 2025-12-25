@@ -1,8 +1,7 @@
-import { pgTable, uuid, jsonb, varchar, boolean, timestamp, integer, index } from "drizzle-orm/pg-core";
+import { pgTable, uuid, boolean, timestamp, integer, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { stores } from "./stores";
-import { countries } from "./countries";
-import { cities } from "./cities";
+import { categories } from "./categories";
 
 /**
  * Store Category Assignments Table
@@ -26,9 +25,6 @@ export const storeCategoryAssignments = pgTable("store_category_assignments", {
     index("store_cat_assign_category_idx").on(table.categoryId),
     index("store_cat_assign_sponsored_idx").on(table.categoryId, table.isSponsored, table.sorting),
 ]);
-
-// Forward declaration of categories to avoid circular dependency
-import { categories } from "./categories";
 
 // Relations
 export const storeCategoryAssignmentsRelations = relations(storeCategoryAssignments, ({ one }) => ({
