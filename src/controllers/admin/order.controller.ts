@@ -301,6 +301,7 @@ export class OrderController {
 
         const schema = z.object({
             type: z.enum(['full', 'partial']),
+            method: z.enum(['coins', 'original']),
             amount: z.string().optional(),
         });
         const validation = schema.safeParse(body);
@@ -324,7 +325,14 @@ export class OrderController {
             return ApiResponse.forbidden(c, 'Access denied');
         }
 
-        const updated = await OrderService.initiateRefund(id, validation.data.type, validation.data.amount);
-        return ApiResponse.success(c, { message: 'Refund initiated', data: updated });
+        const admin = c.get('admin');
+        const updated = await OrderService.initiateRefund(
+            id,
+            validation.data.type,
+            validation.data.method,
+            validation.data.amount,
+            admin.adminId
+        );
+        return ApiResponse.success(c, { message: `Refund initiated via ${validation.data.method}`, data: updated });
     }
 }

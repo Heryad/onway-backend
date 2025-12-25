@@ -89,6 +89,18 @@
   - [Create Story](#post---17)
   - [Update Story](#put-id--17)
   - [Delete Story](#delete-id--17)
+- [Settings](#settings)
+  - [Get Global](#get-global)
+  - [Get Current Scope](#get-current)
+  - [List All](#get---18)
+  - [Create](#post---18)
+  - [Update](#put-id--18)
+- [Payments](#payments)
+  - [Payment Options](#get-options)
+  - [List Payments](#get---19)
+  - [Get Payment](#get-id--19)
+  - [Payment Stats](#get-stats)
+  - [Transactions](#get-transactions)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1567,6 +1579,151 @@ Update story caption or expiry.
 ### DELETE `/:id` 🔒
 
 Delete story.
+
+---
+
+## Settings
+
+**Base URL:** `/api/v1/admin/settings`
+
+**Access:** `owner` only for write operations
+
+---
+
+### GET `/global` 🔒
+
+Get global settings (fallback settings).
+
+---
+
+### GET `/current` 🔒
+
+Get settings for admin's current scope (city > country > global fallback).
+
+---
+
+### GET `/` 🔒 (owner)
+
+List all settings (global + per-city/country).
+
+---
+
+### POST `/` 🔒 (owner)
+
+Create settings for city/country.
+
+**Request:**
+```json
+{
+  "cityId": "...",
+  "availableLanguages": ["en", "ar"],
+  "defaultLanguage": "en",
+  "coinRewardsEnabled": true,
+  "coinsPerOrder": 10,
+  "theme": {
+    "primaryColor": "#FF5722",
+    "secondaryColor": "#2196F3",
+    "accentColor": "#4CAF50",
+    "backgroundColor": "#FFFFFF"
+  },
+  "maintenanceMode": false
+}
+```
+
+---
+
+### PUT `/:id` 🔒 (owner)
+
+Update settings.
+
+---
+
+### DELETE `/:id` 🔒 (owner)
+
+Delete city/country settings (cannot delete global).
+
+---
+
+## Payments
+
+**Base URL:** `/api/v1/admin/payments`
+
+**Access:** `owner`, `city_admin` (geo filtered)
+
+---
+
+### Payment Options
+
+#### GET `/options` 🔒
+
+List payment options.
+
+**Query Params:** `countryId`, `isActive`, `gateway`.
+
+#### POST `/options` 🔒
+
+Create payment option.
+
+**Request:**
+```json
+{
+  "name": "Visa/Mastercard",
+  "gateway": "stripe",
+  "fee": "2.50",
+  "feeType": "percent",
+  "countryId": "..."
+}
+```
+
+#### PUT `/options/:id` 🔒
+
+Update payment option.
+
+#### DELETE `/options/:id` 🔒
+
+Delete payment option.
+
+#### PATCH `/options/:id/toggle-status` 🔒
+
+Enable/Disable payment option.
+
+---
+
+### Payments (Order Payments)
+
+#### GET `/` 🔒
+
+List payments.
+
+**Query Params:** `orderId`, `userId`, `status`, `dateFrom`, `dateTo`.
+
+#### GET `/:id` 🔒
+
+Get payment details.
+
+#### GET `/stats` 🔒
+
+Get payment stats (totals, success rate).
+
+---
+
+### Transactions (Wallet/Coins)
+
+#### GET `/transactions` 🔒
+
+List transactions.
+
+**Query Params:** `senderId`, `receiverId`, `type`, `status`.
+
+**Types:** `transfer`, `withdraw`, `deposit`, `reward`, `refund`, `purchase`.
+
+#### GET `/transactions/:id` 🔒
+
+Get transaction details.
+
+#### GET `/transactions/ref/:reference` 🔒
+
+Get transaction by reference number.
 
 ---
 

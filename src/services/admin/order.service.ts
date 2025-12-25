@@ -330,12 +330,20 @@ export class OrderService {
 
     // ========== Phase 4: Refunds ==========
 
-    static async initiateRefund(orderId: string, refundType: 'full' | 'partial', amount?: string): Promise<Order | null> {
+    static async initiateRefund(
+        orderId: string,
+        refundType: 'full' | 'partial',
+        refundMethod: 'coins' | 'original',
+        amount?: string,
+        adminId?: string
+    ): Promise<Order | null> {
         const order = await this.getById(orderId);
         if (!order) return null;
 
+        const refundAmount = amount || order.total;
         const newPaymentStatus = refundType === 'full' ? 'refunded' : 'partially_refunded';
 
+        // Update order payment status
         const [updated] = await db.update(orders)
             .set({
                 paymentStatus: newPaymentStatus,
@@ -344,15 +352,39 @@ export class OrderService {
             .where(eq(orders.id, orderId))
             .returning();
 
+        // Process refund based on method
+        if (refundMethod === 'coins') {
+            // Create a coin transaction for the user
+            const { transactions } = await import('../../db');
+            const { nanoid } = await import('nanoid');
+
+            await db.insert(transactions).values({
+                reference: `REF-${nanoid(12)}`,
+                receiverId: order.userId,
+                amount: refundAmount,
+                type: 'refund',
+                status: 'completed',
+                memo: `Refund for order #${order.orderNumber}`,
+                cityId: order.cityId,
+                countryId: order.countryId,
+            });
+        } else {
+            // TODO: Process refund through payment gateway
+            // This would call the payment service to refund via original method
+            // For now, just log to history
+        }
+
         // Log to history
         await db.insert(orderStatusHistory).values({
             orderId,
             fromStatus: order.status,
-            toStatus: order.status, // Status doesn't change, just payment status
+            toStatus: order.status,
             changedByType: 'admin',
-            notes: `Refund initiated: ${refundType}${amount ? ` - Amount: ${amount}` : ''}`,
+            changedById: adminId,
+            notes: `Refund initiated: ${refundType} via ${refundMethod}${amount ? ` - Amount: ${amount}` : ''}`,
         });
 
         return updated;
     }
 }
+
