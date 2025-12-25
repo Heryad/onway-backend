@@ -2,6 +2,7 @@ import { pgTable, uuid, jsonb, varchar, boolean, timestamp, decimal, integer, in
 import { relations } from "drizzle-orm";
 import { countries } from "./countries";
 import { cities } from "./cities";
+import { cityZones } from "./city-zones";
 
 /**
  * Discount Types Enum
@@ -87,6 +88,7 @@ export const stores = pgTable("stores", {
     // Commission rate for this store
     commissionRate: decimal("commission_rate", { precision: 5, scale: 2 }).default("15.00"),
 
+    zoneId: uuid("zone_id").references(() => cityZones.id, { onDelete: "set null" }),
     cityId: uuid("city_id").notNull().references(() => cities.id, { onDelete: "restrict" }),
     countryId: uuid("country_id").notNull().references(() => countries.id, { onDelete: "restrict" }),
 
@@ -94,6 +96,7 @@ export const stores = pgTable("stores", {
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, (table) => [
+    index("stores_zone_id_idx").on(table.zoneId),
     index("stores_city_id_idx").on(table.cityId),
     index("stores_country_id_idx").on(table.countryId),
     index("stores_is_active_idx").on(table.isActive),
@@ -106,6 +109,10 @@ export const stores = pgTable("stores", {
 
 // Relations
 export const storesRelations = relations(stores, ({ one }) => ({
+    zone: one(cityZones, {
+        fields: [stores.zoneId],
+        references: [cityZones.id],
+    }),
     city: one(cities, {
         fields: [stores.cityId],
         references: [cities.id],

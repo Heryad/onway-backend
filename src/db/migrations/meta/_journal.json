@@ -8,6 +8,13 @@
       "when": 1765978696816,
       "tag": "0000_clear_deathstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1766676769745,
+      "tag": "0001_omniscient_hydra",
+      "breakpoints": true
     }
   ]
 }

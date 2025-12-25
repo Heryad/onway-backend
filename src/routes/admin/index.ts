@@ -16,6 +16,7 @@ import { storePayoutRoutes } from './store-payout.routes';
 import { driverRoutes } from './driver.routes';
 import { driverPayoutRoutes } from './driver-payout.routes';
 import { userRoutes } from './user.routes';
+import { orderRoutes } from './order.routes';
 
 const adminRoutes = new Hono();
 
@@ -37,6 +38,9 @@ adminRoutes.route('/banners', bannerRoutes);
 
 // Users
 adminRoutes.route('/users', userRoutes);
+
+// Orders
+adminRoutes.route('/orders', orderRoutes);
 
 // Stores
 adminRoutes.route('/stores', storeRoutes);

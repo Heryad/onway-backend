@@ -1,16 +1,35 @@
 export const QUEUE_NAMES = {
     PAYOUTS: 'payouts',
+    DISPATCH: 'dispatch',
 } as const;
 
 export const JOB_NAMES = {
     GENERATE_STORE_PAYOUTS: 'generate-store-payouts',
     GENERATE_DRIVER_PAYOUTS: 'generate-driver-payouts',
+    FIND_DRIVER: 'find-driver',
+    DRIVER_RESPONSE_TIMEOUT: 'driver-response-timeout',
 } as const;
 
 export interface PayoutJobData {
-    periodStart?: string; // YYYY-MM-DD
-    periodEnd?: string;   // YYYY-MM-DD
-    storeId?: string;     // Optional: Single store run
-    driverId?: string;    // Optional: Single driver run
+    periodStart?: string;
+    periodEnd?: string;
+    storeId?: string;
+    driverId?: string;
     forced?: boolean;
+}
+
+export interface DispatchJobData {
+    orderId: string;
+    storeId: string;
+    cityId: string;
+    storeLocation?: { lat: number; lng: number };
+    excludeDriverIds?: string[];
+    attempt?: number;
+}
+
+export interface DriverTimeoutJobData {
+    orderId: string;
+    driverOrderId: string;
+    driverId: string;
+    attempt: number;
 }

@@ -57,6 +57,13 @@
   - [Update User](#put-id--11)
   - [Toggle Status](#patch-idtoggle-status-2)
   - [Get Addresses](#get-idaddresses)
+- [Orders](#orders)
+  - [List Orders](#get---12)
+  - [Get Order](#get-id--12)
+  - [Update Status](#patch-idstatus)
+  - [Cancel Order](#post-idcancel)
+  - [Assign Driver](#post-idassign-driver)
+  - [Initiate Refund](#post-idrefund)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1087,6 +1094,101 @@ Toggle active status (Ban/Unban).
 ### GET `/:id/addresses` 🔒
 
 Get user saved addresses.
+
+---
+
+## Orders
+
+**Base URL:** `/api/v1/admin/orders`
+
+**Access:** `owner`, `city_admin`, `support` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List orders.
+
+**Query Params:** `storeId`, `userId`, `status`, `paymentStatus`, `dateFrom`, `dateTo`, `orderNumber`.
+
+---
+
+### GET `/:id` 🔒
+
+Get order details with store and user info.
+
+---
+
+### GET `/:id/items` 🔒
+
+Get order items.
+
+---
+
+### GET `/:id/history` 🔒
+
+Get order status transition history.
+
+---
+
+### PATCH `/:id/status` 🔒
+
+Force update order status.
+
+**Request:**
+```json
+{
+  "status": "delivered",
+  "notes": "Manually confirmed"
+}
+```
+
+---
+
+### POST `/:id/cancel` 🔒
+
+Cancel order.
+
+**Request:**
+```json
+{
+  "reason": "user_requested",
+  "notes": "Customer called"
+}
+```
+
+---
+
+### POST `/:id/assign-driver` 🔒
+
+Manually assign a driver.
+
+**Request:**
+```json
+{
+  "driverId": "..."
+}
+```
+
+---
+
+### POST `/:id/reassign-driver` 🔒
+
+Reassign to different driver.
+
+---
+
+### POST `/:id/refund` 🔒
+
+Initiate refund.
+
+**Request:**
+```json
+{
+  "type": "full",
+  "amount": "25.00"
+}
+```
 
 ---
 

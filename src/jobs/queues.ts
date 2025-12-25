@@ -8,14 +8,32 @@ export const payoutQueue = new Queue(QUEUE_NAMES.PAYOUTS, {
         attempts: 3,
         backoff: {
             type: 'exponential',
-            delay: 1000, // 1s, 2s, 4s...
+            delay: 1000,
         },
         removeOnComplete: {
-            count: 100, // Keep last 100 completed jobs
-            age: 24 * 3600, // Or last 24h
+            count: 100,
+            age: 24 * 3600,
         },
         removeOnFail: {
-            count: 500, // Keep fails longer for debugging
+            count: 500,
+        },
+    },
+});
+
+export const dispatchQueue = new Queue(QUEUE_NAMES.DISPATCH, {
+    connection: redisConnection,
+    defaultJobOptions: {
+        attempts: 5,
+        backoff: {
+            type: 'exponential',
+            delay: 2000,
+        },
+        removeOnComplete: {
+            count: 500,
+            age: 12 * 3600,
+        },
+        removeOnFail: {
+            count: 1000,
         },
     },
 });

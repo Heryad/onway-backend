@@ -8,6 +8,7 @@ import { httpLoggerMiddleware } from './middleware';
 import { routes } from './routes';
 import { initScheduler } from './jobs/scheduler';
 import './jobs/workers/payout.worker';
+import './jobs/workers/dispatch.worker';
 
 // Initialize Hono app
 const app = new Hono();
