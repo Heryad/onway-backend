@@ -101,6 +101,9 @@
   - [Get Payment](#get-id--19)
   - [Payment Stats](#get-stats)
   - [Transactions](#get-transactions)
+- [Notifications](#notifications)
+  - [Send](#post-send)
+  - [Broadcast](#post-broadcast)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1724,6 +1727,62 @@ Get transaction details.
 #### GET `/transactions/ref/:reference` 🔒
 
 Get transaction by reference number.
+
+---
+
+## Notifications
+
+**Base URL:** `/api/v1/admin/notifications`
+
+**Access:** `owner`, `city_admin` (geo filtered)
+
+**Real-time:** Socket.io for instant delivery when user is online.
+
+---
+
+### GET `/` 🔒
+
+List user's notifications.
+
+**Query Params:** `userId` (required), `unreadOnly`.
+
+---
+
+### POST `/send` 🔒
+
+Send notification to single user.
+
+**Request:**
+```json
+{
+  "userId": "...",
+  "type": "system",
+  "title": "Welcome!",
+  "body": "Thanks for joining.",
+  "data": { "key": "value" },
+  "actionUrl": "/home"
+}
+```
+
+**Types:** `order_update`, `order_delivered`, `promotion`, `promo_code`, `chat_message`, `support_reply`, `reward`, `system`.
+
+---
+
+### POST `/broadcast` 🔒
+
+Broadcast to multiple users.
+
+**Request:**
+```json
+{
+  "type": "promotion",
+  "title": "50% Off!",
+  "body": "Limited time offer.",
+  "cityId": "..."
+}
+```
+
+**Targeting:** `userIds` (specific) or `cityId`/`countryId` (geo).
 
 ---
 

@@ -24,6 +24,7 @@ import { reviewRoutes } from './review.routes';
 import { storyRoutes } from './story.routes';
 import { settingsRoutes } from './settings.routes';
 import { paymentRoutes } from './payment.routes';
+import { notificationRoutes } from './notification.routes';
 
 const adminRoutes = new Hono();
 
@@ -81,5 +82,8 @@ adminRoutes.route('/settings', settingsRoutes);
 
 // Payments
 adminRoutes.route('/payments', paymentRoutes);
+
+// Notifications
+adminRoutes.route('/notifications', notificationRoutes);
 
 export { adminRoutes };
