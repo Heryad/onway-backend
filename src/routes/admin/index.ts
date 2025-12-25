@@ -19,6 +19,7 @@ import { userRoutes } from './user.routes';
 import { orderRoutes } from './order.routes';
 import { promoCodeRoutes } from './promo-code.routes';
 import { promotionRoutes } from './promotion.routes';
+import { supportRoutes } from './support.routes';
 
 const adminRoutes = new Hono();
 
@@ -61,5 +62,8 @@ adminRoutes.route('/driver-payouts', driverPayoutRoutes);
 // Marketing
 adminRoutes.route('/promo-codes', promoCodeRoutes);
 adminRoutes.route('/promotions', promotionRoutes);
+
+// Support
+adminRoutes.route('/support-tickets', supportRoutes);
 
 export { adminRoutes };

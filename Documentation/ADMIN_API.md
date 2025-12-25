@@ -73,6 +73,12 @@
   - [List Promotions](#get---14)
   - [Create Promotion](#post---14)
   - [Manage Stores](#post-idstores)
+- [Support Tickets](#support-tickets)
+  - [List Tickets](#get---15)
+  - [Get Ticket](#get-id--15)
+  - [Update Status](#patch-idstatus-2)
+  - [Assign Admin](#patch-idassign)
+  - [Reply to Ticket](#post-idmessages)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -1347,6 +1353,106 @@ Add store to promotion.
 ### DELETE `/:id/stores/:storeId` 🔒
 
 Remove store from promotion.
+
+---
+
+## Support Tickets
+
+**Base URL:** `/api/v1/admin/support-tickets`
+
+**Access:** `owner`, `city_admin`, `support` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List support tickets.
+
+**Query Params:** `userId`, `assignedAdminId`, `status`, `department`, `priority`, `search`.
+
+---
+
+### GET `/:id` 🔒
+
+Get ticket details with user and order info.
+
+---
+
+### PATCH `/:id/status` 🔒
+
+Update ticket status.
+
+**Request:**
+```json
+{
+  "status": "resolved"
+}
+```
+
+**Statuses:** `open`, `in_progress`, `waiting_user`, `resolved`, `closed`.
+
+---
+
+### PATCH `/:id/assign` 🔒
+
+Assign ticket to admin.
+
+**Request:**
+```json
+{
+  "adminId": "..."
+}
+```
+
+---
+
+### PATCH `/:id/priority` 🔒
+
+Update ticket priority.
+
+**Request:**
+```json
+{
+  "priority": "urgent"
+}
+```
+
+**Priorities:** `low`, `medium`, `high`, `urgent`.
+
+---
+
+### PATCH `/:id/department` 🔒
+
+Update ticket department.
+
+**Request:**
+```json
+{
+  "department": "orders"
+}
+```
+
+**Departments:** `orders`, `technical`, `general`, `payment`, `driver`, `store`.
+
+---
+
+### GET `/:id/messages` 🔒
+
+Get ticket messages.
+
+---
+
+### POST `/:id/messages` 🔒
+
+Reply to ticket.
+
+**Request:**
+```json
+{
+  "body": "We've resolved your issue.",
+  "type": "text"
+}
+```
 
 ---
 
