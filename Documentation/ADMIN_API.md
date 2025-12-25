@@ -36,6 +36,21 @@
   - [Create Zone](#post---3)
   - [Update Zone](#put-id--3)
   - [Delete Zone](#delete-id--3)
+- [Categories](#categories)
+  - [List Categories](#get---4)
+  - [Create Category](#post---4)
+  - [Update Category](#put-id--4)
+  - [Delete Category](#delete-id--4)
+- [Sections](#sections)
+  - [List Sections](#get---5)
+  - [Create Section](#post---5)
+  - [Update Section](#put-id--5)
+  - [Delete Section](#delete-id--5)
+- [Banners](#banners)
+  - [List Banners](#get---6)
+  - [Create Banner](#post---6)
+  - [Update Banner](#put-id--6)
+  - [Delete Banner](#delete-id--6)
 - [Roles & Permissions](#roles--permissions)
 - [Error Codes](#error-codes)
 
@@ -695,6 +710,284 @@ Delete zone.
 ### PATCH `/:id/toggle-status` 🔒
 
 Toggle zone active status.
+
+---
+
+## Categories
+
+**Base URL:** `/api/v1/admin/categories`
+
+**Access:** `owner`, `country_admin`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List categories.
+
+**Query Parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cityId | uuid | Filter by city |
+| countryId | uuid | Filter by country |
+| search | string | Search by name |
+| isActive | boolean | Filter by status |
+| page | number | Page (default: 1) |
+| limit | number | Per page (default: 50) |
+| sortOrder | string | `asc`, `desc` |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "...",
+      "name": { "en": "Restaurants", "ar": "مطاعم" },
+      "description": { "en": "Food delivery", "ar": "توصيل الطعام" },
+      "avatar": "https://example.com/restaurant.png",
+      "sorting": 1,
+      "cityId": "...",
+      "countryId": "...",
+      "isActive": true
+    }
+  ]
+}
+```
+
+---
+
+### POST `/` 🔒
+
+Create category.
+
+**Request:**
+```json
+{
+  "name": { "en": "Restaurants", "ar": "مطاعم" },
+  "description": { "en": "Food delivery" },
+  "avatar": "https://example.com/restaurant.png",
+  "sorting": 1,
+  "cityId": "...",
+  "countryId": "..."
+}
+```
+
+---
+
+### PUT `/:id` 🔒
+
+Update category.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete category.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle category status.
+
+---
+
+## Sections
+
+**Base URL:** `/api/v1/admin/sections`
+
+**Access:** `owner`, `country_admin`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List sections.
+
+**Query Parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cityId | uuid | Filter by city |
+| countryId | uuid | Filter by country |
+| search | string | Search by name |
+| isActive | boolean | Filter by status |
+| comingSoon | boolean | Filter coming soon |
+| page | number | Page (default: 1) |
+| limit | number | Per page (default: 50) |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "...",
+      "name": { "en": "Food Delivery", "ar": "توصيل الطعام" },
+      "description": { "en": "Order food from restaurants" },
+      "avatar": "https://example.com/food.png",
+      "sorting": 1,
+      "comingSoon": false,
+      "cityId": "...",
+      "isActive": true
+    },
+    {
+      "id": "...",
+      "name": { "en": "Grocery", "ar": "بقالة" },
+      "description": { "en": "Fresh groceries delivered" },
+      "avatar": "https://example.com/grocery.png",
+      "sorting": 2,
+      "comingSoon": false,
+      "isActive": true
+    },
+    {
+      "id": "...",
+      "name": { "en": "Taxi", "ar": "تاكسي" },
+      "description": { "en": "Book a ride" },
+      "avatar": "https://example.com/taxi.png",
+      "sorting": 3,
+      "comingSoon": true,
+      "isActive": true
+    }
+  ]
+}
+```
+
+---
+
+### POST `/` 🔒
+
+Create section.
+
+**Request:**
+```json
+{
+  "name": { "en": "Food Delivery", "ar": "توصيل الطعام" },
+  "description": { "en": "Order food from restaurants" },
+  "avatar": "https://example.com/food.png",
+  "sorting": 1,
+  "comingSoon": false,
+  "cityId": "...",
+  "countryId": "..."
+}
+```
+
+---
+
+### PUT `/:id` 🔒
+
+Update section.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete section.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle section status.
+
+---
+
+## Banners
+
+**Base URL:** `/api/v1/admin/banners`
+
+**Access:** `owner`, `country_admin`, `city_admin` (geo filtered)
+
+---
+
+### GET `/` 🔒
+
+List banners.
+
+**Query Parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| cityId | uuid | Filter by city |
+| countryId | uuid | Filter by country |
+| type | enum | `view`, `clickable`, `url` |
+| isActive | boolean | Filter by status |
+| page | number | Page (default: 1) |
+| limit | number | Per page (default: 50) |
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "...",
+      "thumbnail": "https://example.com/banner.jpg",
+      "sorting": 1,
+      "type": "clickable",
+      "clickUrl": null,
+      "storeId": "...",
+      "impressions": 1500,
+      "clicks": 120,
+      "startsAt": "2025-01-01T00:00:00Z",
+      "expiresAt": "2025-01-31T23:59:59Z",
+      "isActive": true,
+      "store": { "id": "...", "name": { "en": "Pizza Place" } }
+    }
+  ]
+}
+```
+
+---
+
+### POST `/` 🔒
+
+Create banner.
+
+**Request:**
+```json
+{
+  "thumbnail": "https://example.com/banner.jpg",
+  "sorting": 1,
+  "type": "clickable",
+  "storeId": "...",
+  "cityId": "...",
+  "countryId": "...",
+  "startsAt": "2025-01-01T00:00:00Z",
+  "expiresAt": "2025-01-31T23:59:59Z"
+}
+```
+
+**Validation:**
+
+| Field | Rules |
+|-------|-------|
+| thumbnail | Required, URL |
+| type | `view` (display only), `clickable` (opens store), `url` (external link) |
+| clickUrl | Required for `url` type |
+| storeId | Required for `clickable` type |
+| startsAt | Optional, ISO datetime |
+| expiresAt | Optional, ISO datetime |
+
+---
+
+### PUT `/:id` 🔒
+
+Update banner.
+
+---
+
+### DELETE `/:id` 🔒
+
+Delete banner.
+
+---
+
+### PATCH `/:id/toggle-status` 🔒
+
+Toggle banner status.
 
 ---
 
