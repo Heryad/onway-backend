@@ -29,6 +29,7 @@ export interface UpdateCityInput {
 
 export interface ListCitiesFilters {
     countryId?: string;
+    cityId?: string; // For filtering by specific city (used by city admins)
     isActive?: boolean;
     search?: string;
     page?: number;
@@ -102,6 +103,7 @@ export class CityService {
     static async list(filters: ListCitiesFilters = {}): Promise<{ data: City[]; total: number }> {
         const {
             countryId,
+            cityId,
             isActive,
             search,
             page = 1,
@@ -114,6 +116,11 @@ export class CityService {
 
         if (countryId) {
             conditions.push(eq(cities.countryId, countryId));
+        }
+
+        // Filter by specific city (for city admins)
+        if (cityId) {
+            conditions.push(eq(cities.id, cityId));
         }
 
         if (isActive !== undefined) {

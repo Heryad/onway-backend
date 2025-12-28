@@ -49,9 +49,11 @@ export class CityController {
             return ApiResponse.validationError(c, errors);
         }
 
+        // Apply geographic filters based on admin's scope
         const filters = {
             ...validation.data,
             countryId: geoFilter.countryId ?? validation.data.countryId,
+            cityId: geoFilter.cityId, // Will filter to specific city for city admins
         };
 
         const { data, total } = await CityService.list(filters);
@@ -65,10 +67,22 @@ export class CityController {
 
     static async getById(c: Context) {
         const id = c.req.param('id');
+        const geoFilter = c.get('geoFilter');
+
+        // City admins can only view their assigned city
+        if (geoFilter.cityId && id !== geoFilter.cityId) {
+            return ApiResponse.forbidden(c, 'Access denied to this city');
+        }
+
         const city = await CityService.getById(id);
 
         if (!city) {
             return ApiResponse.notFound(c, 'City not found');
+        }
+
+        // Additional check: ensure city belongs to admin's country (for country admins)
+        if (geoFilter.countryId && city.countryId !== geoFilter.countryId) {
+            return ApiResponse.forbidden(c, 'Access denied to this city');
         }
 
         return ApiResponse.success(c, {
@@ -99,6 +113,13 @@ export class CityController {
 
     static async update(c: Context) {
         const id = c.req.param('id');
+        const geoFilter = c.get('geoFilter');
+
+        // City admins can only update their assigned city
+        if (geoFilter.cityId && id !== geoFilter.cityId) {
+            return ApiResponse.forbidden(c, 'Access denied to this city');
+        }
+
         const body = await c.req.json();
         const validation = updateCitySchema.safeParse(body);
 
@@ -110,6 +131,11 @@ export class CityController {
         const existing = await CityService.getById(id);
         if (!existing) {
             return ApiResponse.notFound(c, 'City not found');
+        }
+
+        // Additional check: ensure city belongs to admin's country (for country admins)
+        if (geoFilter.countryId && existing.countryId !== geoFilter.countryId) {
+            return ApiResponse.forbidden(c, 'Access denied to this city');
         }
 
         const city = await CityService.update(id, validation.data);
@@ -137,10 +163,21 @@ export class CityController {
 
     static async toggleStatus(c: Context) {
         const id = c.req.param('id');
+        const geoFilter = c.get('geoFilter');
+
+        // City admins can only toggle status of their assigned city
+        if (geoFilter.cityId && id !== geoFilter.cityId) {
+            return ApiResponse.forbidden(c, 'Access denied to this city');
+        }
 
         const existing = await CityService.getById(id);
         if (!existing) {
             return ApiResponse.notFound(c, 'City not found');
+        }
+
+        // Additional check: ensure city belongs to admin's country (for country admins)
+        if (geoFilter.countryId && existing.countryId !== geoFilter.countryId) {
+            return ApiResponse.forbidden(c, 'Access denied to this city');
         }
 
         const city = await CityService.update(id, {

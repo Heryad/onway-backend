@@ -775,13 +775,17 @@ Toggle country active status.
 
 **Base URL:** `/api/v1/admin/cities`
 
-**Access:** `owner`, `country_admin` (filtered by their country)
+**Access:** 
+- **List/View/Update/Toggle Status**: `owner`, `country_admin`, `city_admin` (with geographic restrictions)
+- **Create/Delete**: `owner`, `country_admin` only
 
 ---
 
 ### GET `/` 🔒
 
 List cities.
+
+**Access:** `owner` (all cities), `country_admin` (cities in their country), `city_admin` (their assigned city only)
 
 **Query Parameters:**
 
@@ -809,11 +813,16 @@ List cities.
       "taxRate": "5.00",
       "timezone": "Asia/Dubai",
       "isActive": true,
-      "country": { "id": "...", "name": { "en": "UAE" } }
+      "country": { "id": "...", "name": { "en": "UAE" } },
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-12-25T12:00:00.000Z"
     }
-  ]
+  ],
+  "meta": { "page": 1, "limit": 50, "total": 10 }
 }
 ```
+
+**Note:** Results are automatically filtered based on admin's geographic scope.
 
 ---
 
@@ -821,11 +830,46 @@ List cities.
 
 Get city by ID.
 
+**Access:** `owner` (any city), `country_admin` (cities in their country), `city_admin` (their assigned city only)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "City retrieved",
+  "data": {
+    "id": "770e8400-e29b-41d4-a716-446655440000",
+    "name": { "en": "Dubai", "ar": "دبي" },
+    "countryId": "660e8400-e29b-41d4-a716-446655440000",
+    "baseDeliveryFee": "10.00",
+    "primeDeliveryFee": "5.00",
+    "freeDeliveryThreshold": "100.00",
+    "serviceFee": "2.00",
+    "taxRate": "5.00",
+    "timezone": "Asia/Dubai",
+    "geoBounds": [[25.0, 55.0], [25.3, 55.3]],
+    "isActive": true,
+    "country": { "id": "...", "name": { "en": "UAE" } }
+  }
+}
+```
+
+**Response (403):**
+```json
+{
+  "success": false,
+  "message": "Access denied to this city",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
+
 ---
 
 ### POST `/` 🔒
 
 Create city.
+
+**Access:** `owner`, `country_admin` only
 
 **Request:**
 ```json
@@ -855,11 +899,67 @@ Create city.
 | timezone | Optional, string |
 | geoBounds | Optional, array of [lat, lng] coordinates |
 
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "City created successfully",
+  "data": {
+    "id": "770e8400-e29b-41d4-a716-446655440000",
+    "name": { "en": "Dubai", "ar": "دبي" },
+    "countryId": "660e8400-e29b-41d4-a716-446655440000",
+    "baseDeliveryFee": "10.00",
+    "isActive": true
+  }
+}
+```
+
 ---
 
 ### PUT `/:id` 🔒
 
-Update city. All fields optional except `countryId` cannot be changed.
+Update city.
+
+**Access:** `owner` (any city), `country_admin` (cities in their country), `city_admin` (their assigned city only)
+
+**Request:**
+```json
+{
+  "name": { "en": "Dubai City", "ar": "مدينة دبي" },
+  "baseDeliveryFee": "12.00",
+  "primeDeliveryFee": "6.00",
+  "serviceFee": "2.50",
+  "taxRate": "5.00",
+  "timezone": "Asia/Dubai",
+  "isActive": true
+}
+```
+
+All fields optional except `countryId` cannot be changed.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "City updated successfully",
+  "data": {
+    "id": "770e8400-e29b-41d4-a716-446655440000",
+    "name": { "en": "Dubai City", "ar": "مدينة دبي" },
+    "baseDeliveryFee": "12.00",
+    "isActive": true,
+    "updatedAt": "2025-12-25T12:00:00.000Z"
+  }
+}
+```
+
+**Response (403):**
+```json
+{
+  "success": false,
+  "message": "Access denied to this city",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
 
 ---
 
@@ -867,11 +967,55 @@ Update city. All fields optional except `countryId` cannot be changed.
 
 Delete city.
 
+**Access:** `owner`, `country_admin` only
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "City deleted successfully",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
+
+**Response (403):**
+```json
+{
+  "success": false,
+  "message": "Access denied to this city",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
+
 ---
 
 ### PATCH `/:id/toggle-status` 🔒
 
 Toggle city active status.
+
+**Access:** `owner` (any city), `country_admin` (cities in their country), `city_admin` (their assigned city only)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "City activated successfully",
+  "data": {
+    "id": "770e8400-e29b-41d4-a716-446655440000",
+    "isActive": true,
+    "updatedAt": "2025-12-25T12:00:00.000Z"
+  }
+}
+```
+
+**Response (403):**
+```json
+{
+  "success": false,
+  "message": "Access denied to this city",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
 
 ---
 
