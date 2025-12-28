@@ -1888,7 +1888,7 @@ Delete story.
 
 **Base URL:** `/api/v1/admin/settings`
 
-**Access:** `owner` only for write operations
+**Access:** `owner`, `country_admin`, `city_admin` (with geographic restrictions)
 
 ---
 
@@ -1904,15 +1904,29 @@ Get settings for admin's current scope (city > country > global fallback).
 
 ---
 
-### GET `/` 🔒 (owner)
+### GET `/` 🔒
 
 List all settings (global + per-city/country).
 
+**Access:** 
+- `owner`: Can view all.
+- `country_admin`: Can view their country and cities within it.
+- `city_admin`: Can view their city only.
+
+**Query Parameters:**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| countryId | uuid | Filter by country |
+| cityId | uuid | Filter by city |
+
 ---
 
-### POST `/` 🔒 (owner)
+### POST `/` 🔒
 
 Create settings for city/country.
+
+**Access:** scope restricted by admin role.
 
 **Request:**
 ```json
@@ -1934,15 +1948,19 @@ Create settings for city/country.
 
 ---
 
-### PUT `/:id` 🔒 (owner)
+### PUT `/:id` 🔒
 
 Update settings.
 
+**Access:** scope restricted by admin role (cannot manage global settings unless owner).
+
 ---
 
-### DELETE `/:id` 🔒 (owner)
+### DELETE `/:id` 🔒
 
 Delete city/country settings (cannot delete global).
+
+**Access:** scope restricted by admin role.
 
 ---
 

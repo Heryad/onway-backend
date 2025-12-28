@@ -1,5 +1,5 @@
-import { eq, and, isNull, SQL } from 'drizzle-orm';
-import { db, settings } from '../../db';
+import { eq, and, isNull, or, inArray, SQL, asc } from 'drizzle-orm';
+import { db, settings, cities } from '../../db';
 import type { Settings, NewSettings, SplashScreenType, ThemeConfig, SocialMediaLinks, SupportContact } from '../../db/schema/settings';
 
 export interface UpdateSettingsInput {
@@ -25,6 +25,11 @@ export interface UpdateSettingsInput {
 export interface CreateSettingsInput extends UpdateSettingsInput {
     cityId?: string;
     countryId?: string;
+}
+
+export interface ListSettingsFilters {
+    countryId?: string;
+    cityId?: string;
 }
 
 export class SettingsService {
@@ -122,10 +127,34 @@ export class SettingsService {
         return setting ?? null;
     }
 
-    static async list(): Promise<Settings[]> {
+    static async list(filters: ListSettingsFilters = {}): Promise<Settings[]> {
+        const { countryId, cityId } = filters;
+        const conditions: SQL[] = [];
+
+        if (cityId) {
+            // City admin: see their city settings
+            conditions.push(eq(settings.cityId, cityId));
+        } else if (countryId) {
+            // Country admin: see their country settings AND their cities' settings
+            const countryScopeCondition = or(
+                eq(settings.countryId, countryId),
+                inArray(
+                    settings.cityId,
+                    db.select({ id: cities.id }).from(cities).where(eq(cities.countryId, countryId))
+                )
+            );
+
+            if (countryScopeCondition) {
+                conditions.push(countryScopeCondition);
+            }
+        }
+
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
         const all = await db.query.settings.findMany({
+            where: whereClause,
             with: { city: true, country: true },
-            orderBy: (settings, { asc }) => [asc(settings.countryId), asc(settings.cityId)],
+            orderBy: [asc(settings.countryId), asc(settings.cityId)],
         });
         return all;
     }

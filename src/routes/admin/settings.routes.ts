@@ -12,16 +12,16 @@ settingsRoutes.get('/global', geoAccessMiddleware, SettingsController.getGlobal)
 // Get settings for current scope
 settingsRoutes.get('/current', cityAdminMiddleware, geoAccessMiddleware, SettingsController.get);
 
-// List all settings (owner only)
-settingsRoutes.get('/', ownerOnlyMiddleware, SettingsController.list);
+// List all settings (filtered by scope)
+settingsRoutes.get('/', cityAdminMiddleware, geoAccessMiddleware, SettingsController.list);
 
-// Create settings (owner only)
-settingsRoutes.post('/', ownerOnlyMiddleware, SettingsController.create);
+// Create settings (scope restricted)
+settingsRoutes.post('/', cityAdminMiddleware, geoAccessMiddleware, SettingsController.create);
 
-// Update settings (owner only)
-settingsRoutes.put('/:id', ownerOnlyMiddleware, SettingsController.update);
+// Update settings (scope restricted)
+settingsRoutes.put('/:id', cityAdminMiddleware, geoAccessMiddleware, SettingsController.update);
 
-// Delete settings (owner only)
-settingsRoutes.delete('/:id', ownerOnlyMiddleware, SettingsController.delete);
+// Delete settings (scope restricted)
+settingsRoutes.delete('/:id', cityAdminMiddleware, geoAccessMiddleware, SettingsController.delete);
 
 export { settingsRoutes };

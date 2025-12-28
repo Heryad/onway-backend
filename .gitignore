@@ -9,6 +9,7 @@ coverage
 .vscode
 .idea
 .agent
+.agent
 *.swp
 *.swo
 *~
