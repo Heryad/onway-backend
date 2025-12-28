@@ -25,6 +25,7 @@ export interface UpdateCountryInput {
 export interface ListCountriesFilters {
     search?: string;
     isActive?: boolean;
+    countryId?: string; // For filtering by specific country (used by country admins)
     page?: number;
     limit?: number;
     sortBy?: 'createdAt' | 'name';
@@ -91,6 +92,7 @@ export class CountryService {
         const {
             search,
             isActive,
+            countryId,
             page = 1,
             limit = 50,
             sortBy = 'createdAt',
@@ -101,6 +103,11 @@ export class CountryService {
 
         if (isActive !== undefined) {
             conditions.push(eq(countries.isActive, isActive));
+        }
+
+        // Filter by specific country (for country admins)
+        if (countryId) {
+            conditions.push(eq(countries.id, countryId));
         }
 
         const whereClause = conditions.length > 0 ? and(...conditions) : undefined;

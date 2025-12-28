@@ -41,7 +41,16 @@ export class CountryController {
             return ApiResponse.validationError(c, errors);
         }
 
-        const { data, total } = await CountryService.list(validation.data);
+        const admin = c.get('admin');
+        const geoFilter = c.get('geoFilter');
+
+        // If country admin, filter by their assigned country
+        const filters = {
+            ...validation.data,
+            countryId: geoFilter.countryId, // Will be undefined for owners (no filter)
+        };
+
+        const { data, total } = await CountryService.list(filters);
 
         return ApiResponse.paginated(c, data, {
             page: validation.data.page,
@@ -52,6 +61,14 @@ export class CountryController {
 
     static async getById(c: Context) {
         const id = c.req.param('id');
+        const admin = c.get('admin');
+        const geoFilter = c.get('geoFilter');
+
+        // Country admins can only view their assigned country
+        if (geoFilter.countryId && id !== geoFilter.countryId) {
+            return ApiResponse.forbidden(c, 'Access denied to this country');
+        }
+
         const country = await CountryService.getById(id);
 
         if (!country) {
@@ -80,6 +97,14 @@ export class CountryController {
 
     static async update(c: Context) {
         const id = c.req.param('id');
+        const admin = c.get('admin');
+        const geoFilter = c.get('geoFilter');
+
+        // Country admins can only update their assigned country
+        if (geoFilter.countryId && id !== geoFilter.countryId) {
+            return ApiResponse.forbidden(c, 'Access denied to this country');
+        }
+
         const body = await c.req.json();
         const validation = updateCountrySchema.safeParse(body);
 
@@ -118,6 +143,13 @@ export class CountryController {
 
     static async toggleStatus(c: Context) {
         const id = c.req.param('id');
+        const admin = c.get('admin');
+        const geoFilter = c.get('geoFilter');
+
+        // Country admins can only toggle status of their assigned country
+        if (geoFilter.countryId && id !== geoFilter.countryId) {
+            return ApiResponse.forbidden(c, 'Access denied to this country');
+        }
 
         const existing = await CountryService.getById(id);
         if (!existing) {

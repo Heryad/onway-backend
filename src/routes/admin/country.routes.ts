@@ -1,19 +1,22 @@
 import { Hono } from 'hono';
 import { CountryController } from '../../controllers/admin/country.controller';
-import { adminAuthMiddleware, ownerOnlyMiddleware } from '../../middleware/admin/auth';
+import { adminAuthMiddleware, ownerOnlyMiddleware, countryAdminMiddleware } from '../../middleware/admin/auth';
 
 const countryRoutes = new Hono();
 
-// All routes require authentication + owner only (countries are global)
+// All routes require authentication
 countryRoutes.use('*', adminAuthMiddleware);
-countryRoutes.use('*', ownerOnlyMiddleware);
 
-// CRUD endpoints
-countryRoutes.get('/', CountryController.list);
-countryRoutes.get('/:id', CountryController.getById);
-countryRoutes.post('/', CountryController.create);
-countryRoutes.put('/:id', CountryController.update);
-countryRoutes.delete('/:id', CountryController.delete);
-countryRoutes.patch('/:id/toggle-status', CountryController.toggleStatus);
+// List and view - accessible by owner and country admins
+countryRoutes.get('/', countryAdminMiddleware, CountryController.list);
+countryRoutes.get('/:id', countryAdminMiddleware, CountryController.getById);
+
+// Create and delete - owner only
+countryRoutes.post('/', ownerOnlyMiddleware, CountryController.create);
+countryRoutes.delete('/:id', ownerOnlyMiddleware, CountryController.delete);
+
+// Update and toggle status - owner and country admin (with geo check)
+countryRoutes.put('/:id', countryAdminMiddleware, CountryController.update);
+countryRoutes.patch('/:id/toggle-status', countryAdminMiddleware, CountryController.toggleStatus);
 
 export { countryRoutes };

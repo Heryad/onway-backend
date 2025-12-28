@@ -527,13 +527,17 @@ Toggle admin active status.
 
 **Base URL:** `/api/v1/admin/countries`
 
-**Access:** `owner` only (countries are global)
+**Access:** 
+- **List/View/Update/Toggle Status**: `owner`, `country_admin` (country admins can only access their assigned country)
+- **Create/Delete**: `owner` only
 
 ---
 
 ### GET `/` 🔒
 
-List all countries.
+List countries.
+
+**Access:** `owner` (all countries), `country_admin` (their assigned country only)
 
 **Query Parameters:**
 
@@ -559,12 +563,16 @@ List all countries.
       "currencyCode": "AED",
       "currencySymbol": "د.إ",
       "avatar": "https://example.com/uae.png",
-      "isActive": true
+      "isActive": true,
+      "createdAt": "2025-01-01T00:00:00.000Z",
+      "updatedAt": "2025-12-25T12:00:00.000Z"
     }
   ],
   "meta": { "page": 1, "limit": 50, "total": 5 }
 }
 ```
+
+**Note:** Country admins will only see their assigned country in the list.
 
 ---
 
@@ -572,11 +580,46 @@ List all countries.
 
 Get country by ID.
 
+**Access:** `owner` (any country), `country_admin` (their assigned country only)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Country retrieved",
+  "data": {
+    "id": "660e8400-e29b-41d4-a716-446655440000",
+    "name": { "en": "UAE", "ar": "الإمارات" },
+    "phoneCode": "+971",
+    "currency": "Dirham",
+    "currencyCode": "AED",
+    "currencySymbol": "د.إ",
+    "avatar": "https://example.com/uae.png",
+    "isActive": true,
+    "createdAt": "2025-01-01T00:00:00.000Z",
+    "updatedAt": "2025-12-25T12:00:00.000Z"
+  }
+}
+```
+
+**Response (403):**
+```json
+{
+  "success": false,
+  "message": "Access denied to this country",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
+
+*Country admins receive 403 if attempting to access a country other than their assigned one.*
+
 ---
 
 ### POST `/` 🔒
 
 Create country.
+
+**Access:** `owner` only
 
 **Request:**
 ```json
@@ -601,11 +644,74 @@ Create country.
 | currencySymbol | Required, max 10 chars |
 | avatar | Optional, URL |
 
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Country created successfully",
+  "data": {
+    "id": "660e8400-e29b-41d4-a716-446655440000",
+    "name": { "en": "UAE", "ar": "الإمارات" },
+    "phoneCode": "+971",
+    "currency": "Dirham",
+    "currencyCode": "AED",
+    "currencySymbol": "د.إ",
+    "avatar": "https://example.com/uae.png",
+    "isActive": true
+  }
+}
+```
+
 ---
 
 ### PUT `/:id` 🔒
 
-Update country. All fields optional.
+Update country.
+
+**Access:** `owner` (any country), `country_admin` (their assigned country only)
+
+**Request:**
+```json
+{
+  "name": { "en": "United Arab Emirates", "ar": "الإمارات العربية المتحدة" },
+  "phoneCode": "+971",
+  "currency": "Dirham",
+  "currencyCode": "AED",
+  "currencySymbol": "د.إ",
+  "avatar": "https://example.com/uae-updated.png",
+  "isActive": true
+}
+```
+
+All fields optional.
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Country updated successfully",
+  "data": {
+    "id": "660e8400-e29b-41d4-a716-446655440000",
+    "name": { "en": "United Arab Emirates", "ar": "الإمارات العربية المتحدة" },
+    "phoneCode": "+971",
+    "currency": "Dirham",
+    "currencyCode": "AED",
+    "currencySymbol": "د.إ",
+    "avatar": "https://example.com/uae-updated.png",
+    "isActive": true,
+    "updatedAt": "2025-12-25T12:00:00.000Z"
+  }
+}
+```
+
+**Response (403):**
+```json
+{
+  "success": false,
+  "message": "Access denied to this country",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
 
 ---
 
@@ -613,11 +719,55 @@ Update country. All fields optional.
 
 Delete country.
 
+**Access:** `owner` only
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Country deleted successfully",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
+
+**Response (404):**
+```json
+{
+  "success": false,
+  "message": "Country not found",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
+
 ---
 
 ### PATCH `/:id/toggle-status` 🔒
 
 Toggle country active status.
+
+**Access:** `owner` (any country), `country_admin` (their assigned country only)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Country activated successfully",
+  "data": {
+    "id": "660e8400-e29b-41d4-a716-446655440000",
+    "isActive": true,
+    "updatedAt": "2025-12-25T12:00:00.000Z"
+  }
+}
+```
+
+**Response (403):**
+```json
+{
+  "success": false,
+  "message": "Access denied to this country",
+  "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
 
 ---
 
