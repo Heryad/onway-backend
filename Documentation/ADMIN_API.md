@@ -104,6 +104,8 @@
 - [Notifications](#notifications)
   - [Send](#post-send)
   - [Broadcast](#post-broadcast)
+- [Upload Media](#upload-media)
+  - [Upload File](#post--21)
 - [Audit Logs](#audit-logs)
   - [List Logs](#get---20)
   - [Get Log](#get-id--20)
@@ -2100,6 +2102,199 @@ Broadcast to multiple users.
 ```
 
 **Targeting:** `userIds` (specific) or `cityId`/`countryId` (geo).
+
+---
+
+## Upload Media
+
+**Base URL:** `/api/v1/admin/upload`
+
+**Access:** Requires admin authentication. Currently protected with `adminAuthMiddleware`.
+
+**Purpose:** Centralized file upload service for images, documents, and other media files with automatic optimization, thumbnail generation, and S3/MinIO storage.
+
+**Storage:** Files are stored in MinIO/S3 with the following path structure:
+```
+{countryId?}/uploads/{folder}/{year}/{month}/{uuid}-{filename}
+```
+
+---
+
+### POST `/` 🔒
+
+Upload a file to cloud storage with automatic optimization and thumbnail generation for images.
+
+**Headers:**
+```
+Authorization: Bearer <accessToken>
+Content-Type: multipart/form-data
+```
+
+**Request (multipart/form-data):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| file | File | Yes | The file to upload |
+| type | string | No | Folder category (default: 'general'). Examples: 'avatars', 'products', 'banners', 'documents', 'stores' |
+| countryId | uuid | No | Optional country ID for geographic isolation of files |
+
+**File Constraints:**
+
+| Constraint | Value |
+|------------|-------|
+| Max File Size | 10MB (configurable via `MAX_FILE_SIZE` env var) |
+| Allowed Types | All file types (images receive special processing) |
+| Image Formats | JPEG, PNG, WebP, GIF, etc. |
+
+**Image Processing:**
+
+For image files, the system automatically:
+1. **Optimizes** the original image:
+   - Resizes images wider than 2000px to 2000px width (maintains aspect ratio)
+   - Compresses JPEG to 85% quality
+   - Compresses PNG to 80% quality
+   - Compresses WebP to 85% quality
+2. **Generates thumbnail**:
+   - 300x300px cover crop
+   - Stored with `_thumb` suffix
+   - Same format as original
+
+**Example Request (cURL):**
+```bash
+curl -X POST https://api.example.com/api/v1/admin/upload \
+  -H "Authorization: Bearer <accessToken>" \
+  -F "file=@/path/to/image.jpg" \
+  -F "type=products" \
+  -F "countryId=660e8400-e29b-41d4-a716-446655440000"
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "File uploaded successfully",
+  "data": {
+    "url": "https://s3.example.com/bucket/660e8400-e29b-41d4-a716-446655440000/uploads/products/2025/12/a1b2c3d4e5.jpg",
+    "thumbnailUrl": "https://s3.example.com/bucket/660e8400-e29b-41d4-a716-446655440000/uploads/products/2025/12/a1b2c3d4e5_thumb.jpg",
+    "filename": "product_image.jpg",
+    "path": "660e8400-e29b-41d4-a716-446655440000/uploads/products/2025/12/a1b2c3d4e5.jpg",
+    "size": 245678,
+    "mimeType": "image/jpeg"
+  },
+  "timestamp": "2025-12-29T12:00:00.000Z"
+}
+```
+
+**Response (400 - No file):**
+```json
+{
+  "success": false,
+  "message": "No file provided",
+  "timestamp": "2025-12-29T12:00:00.000Z"
+}
+```
+
+**Response (400 - Invalid file):**
+```json
+{
+  "success": false,
+  "message": "Invalid file",
+  "timestamp": "2025-12-29T12:00:00.000Z"
+}
+```
+
+**Response (400 - File too large):**
+```json
+{
+  "success": false,
+  "message": "File too large. Max 10MB",
+  "timestamp": "2025-12-29T12:00:00.000Z"
+}
+```
+
+**Response (500 - Upload failed):**
+```json
+{
+  "success": false,
+  "message": "Upload failed",
+  "error": "Connection to storage service failed",
+  "timestamp": "2025-12-29T12:00:00.000Z"
+}
+```
+
+**Response Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| url | string | Public URL to access the uploaded file |
+| thumbnailUrl | string | Public URL to access the thumbnail (images only) |
+| filename | string | Sanitized filename as stored |
+| path | string | Full object key/path in the S3 bucket |
+| size | number | File size in bytes (after optimization) |
+| mimeType | string | MIME type of the file |
+
+**Environment Variables:**
+
+The upload system requires the following environment variables:
+
+```bash
+# S3/MinIO Configuration
+S3_ENDPOINT=https://s3.example.com      # MinIO/S3 endpoint URL
+S3_BUCKET=onway-media                   # Bucket name
+S3_ACCESS_KEY=your_access_key           # Access key
+S3_SECRET_KEY=your_secret_key           # Secret key
+S3_REGION=us-east-1                     # Region (default: us-east-1)
+S3_PUBLIC_URL=https://s3.example.com    # Public URL for accessing files
+
+# Upload Limits
+MAX_FILE_SIZE=10485760                  # Max file size in bytes (default: 10MB)
+```
+
+**Usage Examples:**
+
+1. **Upload Store Avatar:**
+```bash
+curl -X POST /api/v1/admin/upload \
+  -H "Authorization: Bearer <token>" \
+  -F "file=@store-logo.png" \
+  -F "type=avatars"
+```
+
+2. **Upload Product Image:**
+```bash
+curl -X POST /api/v1/admin/upload \
+  -H "Authorization: Bearer <token>" \
+  -F "file=@product.jpg" \
+  -F "type=products" \
+  -F "countryId=<country-uuid>"
+```
+
+3. **Upload Banner:**
+```bash
+curl -X POST /api/v1/admin/upload \
+  -H "Authorization: Bearer <token>" \
+  -F "file=@banner.jpg" \
+  -F "type=banners"
+```
+
+4. **Upload Document:**
+```bash
+curl -X POST /api/v1/admin/upload \
+  -H "Authorization: Bearer <token>" \
+  -F "file=@document.pdf" \
+  -F "type=documents"
+```
+
+**Notes:**
+
+- Files are automatically organized by upload date (year/month) for better storage management
+- Filenames are sanitized to remove special characters and prevent path traversal
+- Each file gets a unique 10-character ID to prevent naming conflicts
+- Images are automatically optimized to reduce storage costs and improve load times
+- Thumbnails are generated for all images for use in lists and previews
+- The bucket is initialized with public read policy on first use
+- Country-specific isolation is optional but recommended for multi-tenant scenarios
+- Future updates may support User, Driver, and Store authentication tokens
 
 ---
 
