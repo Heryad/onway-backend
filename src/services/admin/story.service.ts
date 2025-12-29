@@ -5,12 +5,12 @@ import type { Story, NewStory, StoryMediaType } from '../../db/schema/stories';
 export interface CreateStoryInput {
     type: StoryMediaType;
     mediaUrl: string;
-    thumbnailUrl?: string;
-    caption?: string;
-    productId?: string;
-    storeId?: string;
-    cityId?: string;
-    countryId?: string;
+    thumbnailUrl?: string | null;
+    caption?: string | null;
+    productId?: string | null;
+    storeId?: string | null;
+    cityId?: string | null;
+    countryId?: string | null;
     expiresAt?: string;
 }
 

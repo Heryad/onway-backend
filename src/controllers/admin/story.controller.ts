@@ -7,12 +7,12 @@ import { storyMediaTypes } from '../../db/schema/stories';
 const createStorySchema = z.object({
     type: z.enum(storyMediaTypes),
     mediaUrl: z.string().url(),
-    thumbnailUrl: z.string().url().optional(),
-    caption: z.string().max(500).optional(),
-    productId: z.string().uuid().optional(),
-    storeId: z.string().uuid().optional(),
-    cityId: z.string().uuid().optional(),
-    countryId: z.string().uuid().optional(),
+    thumbnailUrl: z.string().url().nullish(),
+    caption: z.string().max(500).nullish(),
+    productId: z.string().uuid().nullish(),
+    storeId: z.string().uuid().nullish(),
+    cityId: z.string().uuid().nullish(),
+    countryId: z.string().uuid().nullish(),
     expiresAt: z.string().optional(),
 });
 
