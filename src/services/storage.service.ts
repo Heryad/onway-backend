@@ -4,6 +4,9 @@ import { nanoid } from 'nanoid';
 import { config } from '../config';
 import { logger } from '../lib/logger';
 import path from 'path';
+import ffmpeg from 'fluent-ffmpeg';
+import fs from 'fs/promises';
+import os from 'os';
 
 // Parse S3 endpoint to get MinIO config
 const s3Url = new URL(config.S3_ENDPOINT);
@@ -138,6 +141,49 @@ export class StorageService {
                 });
 
                 thumbnailUrl = `${config.S3_PUBLIC_URL}/${this.bucket}/${thumbObjectName}`;
+            } else if (mimeType.startsWith('video/')) {
+                try {
+                    // Create temp files for ffmpeg processing
+                    const tempPrefix = path.join(os.tmpdir(), `upload-${uniqueId}`);
+                    const tempVideoPath = `${tempPrefix}${extension}`;
+                    const tempThumbPath = `${tempPrefix}-thumb.jpg`;
+
+                    // Write buffer to temp file
+                    await fs.writeFile(tempVideoPath, buffer);
+
+                    // Generate screenshot
+                    await new Promise((resolve, reject) => {
+                        ffmpeg(tempVideoPath)
+                            .outputOptions(['-q:v 2']) // Best JPEG quality
+                            .screenshots({
+                                timestamps: ['1'], // capture at 1 second
+                                filename: path.basename(tempThumbPath),
+                                folder: path.dirname(tempThumbPath),
+                                size: '720x1280'
+                            })
+                            .on('end', resolve)
+                            .on('error', reject);
+                    });
+
+                    // Read generated thumbnail
+                    const thumbnailBuffer = await fs.readFile(tempThumbPath);
+
+                    // Upload thumbnail
+                    const thumbObjectName = `${basePath}/${uniqueId}_thumb.jpg`;
+                    await minioClient.putObject(this.bucket, thumbObjectName, thumbnailBuffer, thumbnailBuffer.length, {
+                        'Content-Type': 'image/jpeg',
+                    });
+
+                    thumbnailUrl = `${config.S3_PUBLIC_URL}/${this.bucket}/${thumbObjectName}`;
+
+                    // Cleanup temp files
+                    await fs.unlink(tempVideoPath).catch(() => { });
+                    await fs.unlink(tempThumbPath).catch(() => { });
+
+                } catch (error) {
+                    logger.warn({ error, filename }, 'Failed to generate video thumbnail (ensure ffmpeg is installed)');
+                    // Failure to generate thumbnail shouldn't block the upload
+                }
             }
 
             // Upload Main File

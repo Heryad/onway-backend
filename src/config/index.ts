@@ -43,7 +43,7 @@ const envSchema = z.object({
     RATE_LIMIT_MAX_REQUESTS: z.string().default('100').transform(Number),
 
     // File Upload
-    MAX_FILE_SIZE: z.string().default('10485760').transform(Number), // 10MB
+    MAX_FILE_SIZE: z.string().default('52428800').transform(Number), // 50MB
 });
 
 // Validate and parse environment variables

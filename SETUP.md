@@ -71,6 +71,17 @@ nano .env
 
 ### 3. Install Dependencies
 
+**System Requirements:**
+- **FFmpeg** is required for video processing (thumbnail generation).
+
+```bash
+# macOS
+brew install ffmpeg
+
+# Ubuntu/Debian
+sudo apt update && sudo apt install ffmpeg
+```
+
 ```bash
 # Install all packages
 bun install

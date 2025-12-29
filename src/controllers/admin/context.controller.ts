@@ -3,6 +3,7 @@ import { CountryService } from '../../services/admin/country.service';
 import { CityService } from '../../services/admin/city.service';
 import { SettingsService } from '../../services/admin/settings.service';
 import { ApiResponse } from '../../lib';
+import { stories } from '@/db';
 
 export class AdministrativeContextController {
     /**
@@ -48,7 +49,7 @@ export class AdministrativeContextController {
             },
             // Module-level capabilities (Broadly enabled for all "owners" of their scope)
             modules: {
-                countries: { view: true, manage: isOwner },
+                countries: { view: is(['owner', 'country_admin']), manage: is(['owner', 'country_admin']) },
                 cities: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
                 admins: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
                 categories: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
@@ -64,7 +65,8 @@ export class AdministrativeContextController {
                 support: { view: true, manage: true },
                 notifications: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
                 auditLogs: { view: isOwner, manage: false },
-                financial: { view: true, manage: is(['owner', 'finance', 'country_admin', 'city_admin']) }
+                financial: { view: true, manage: is(['owner', 'finance', 'country_admin', 'city_admin']) },
+                stories: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) }
             }
         };
 
