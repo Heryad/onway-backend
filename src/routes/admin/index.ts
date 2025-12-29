@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { authRoutes } from './auth.routes';
+import { contextRoutes } from './context.routes';
 import { adminCrudRoutes } from './admin.routes';
 import { countryRoutes } from './country.routes';
 import { cityRoutes } from './city.routes';
@@ -31,6 +32,9 @@ const adminRoutes = new Hono();
 
 // Auth
 adminRoutes.route('/auth', authRoutes);
+
+// Context
+adminRoutes.route('/context', contextRoutes);
 
 // Admin management
 adminRoutes.route('/admins', adminCrudRoutes);

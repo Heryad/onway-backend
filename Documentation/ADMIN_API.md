@@ -11,6 +11,8 @@
   - [Refresh Token](#post-refresh)
   - [Get Profile](#get-me-)
   - [Logout](#post-logout-)
+- [Administrative Context](#administrative-context)
+  - [Get Context](#get-context)
 - [Admin Management](#admin-management)
   - [List Admins](#get--)
   - [Get Admin](#get-id-)
@@ -289,6 +291,112 @@ Authorization: Bearer <accessToken>
   "success": true,
   "message": "Logout successful",
   "timestamp": "2025-12-25T12:00:00.000Z"
+}
+```
+
+---
+
+## Administrative Context
+
+**Base URL:** `/api/v1/admin/context`
+
+Consolidated context for UI initialization. Returns user profile, permissions, and relevant geographic and settings data based on the authenticated user's role and scope.
+
+---
+
+### GET `/` 🔒
+
+Retrieve consolidated administrative context.
+
+**Headers:**
+```
+Authorization: Bearer <accessToken>
+```
+
+**Query Parameters (Optional for previewing/scope switching):**
+
+| Param | Type | Description |
+|-------|------|-------------|
+| countryId | uuid | Request context for specific country (Owner only) |
+| cityId | uuid | Request context for specific city (Owner/Country Admin only) |
+
+**Note on Settings:** Owners and Country Admins receive an **array** of settings. City Admins and other roles receive a **single object** (or null).
+
+**Response (200 - Owner):**
+```json
+{
+  "success": true,
+  "message": "Administrative context retrieved successfully",
+  "data": {
+    "user": {
+      "id": "...",
+      "email": "owner@example.com",
+      "role": "owner",
+      "countryId": null,
+      "cityId": null
+    },
+    "permissions": {
+      "canManageCountries": true,
+      "canManageCities": true,
+      "canManageSettings": true,
+      "role": "owner"
+    },
+    "data": {
+      "countries": [
+        { "id": "...", "name": { "en": "UAE" }, "phoneCode": "+971", ... }
+      ],
+      "cities": [
+        { "id": "...", "name": { "en": "Dubai" }, "countryId": "...", ... }
+      ],
+      "settings": [
+        {
+          "id": "...",
+          "availableLanguages": ["en", "ar"],
+          "defaultLanguage": "en",
+          "cityId": "...",
+          ...
+        }
+      ]
+    }
+  }
+}
+```
+
+**Response (200 - City Admin):**
+```json
+{
+  "success": true,
+  "message": "Administrative context retrieved successfully",
+  "data": {
+    "user": {
+      "id": "...",
+      "email": "cityadmin@example.com",
+      "role": "city_admin",
+      "countryId": "...",
+      "cityId": "..."
+    },
+    "permissions": {
+      "canManageCountries": false,
+      "canManageCities": false,
+      "canManageSettings": true,
+      "role": "city_admin"
+    },
+    "data": {
+      "countries": [
+        { "id": "...", "name": { "en": "UAE" }, ... }
+      ],
+      "cities": [
+        { "id": "...", "name": { "en": "Dubai" }, ... }
+      ],
+      "settings": {
+        "id": "...",
+        "availableLanguages": ["en", "ar"],
+        "defaultLanguage": "en",
+        "cityId": "...",
+        ...
+      }
+    }
+  }
 }
 ```
 
