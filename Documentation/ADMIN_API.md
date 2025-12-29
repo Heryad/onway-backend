@@ -320,7 +320,7 @@ Authorization: Bearer <accessToken>
 | countryId | uuid | Request context for specific country (Owner only) |
 | cityId | uuid | Request context for specific city (Owner/Country Admin only) |
 
-**Note on Settings:** Owners and Country Admins receive an **array** of settings. City Admins and other roles receive a **single object** (or null).
+**Note on Settings:** All administrative roles now receive an **array** of settings. This allows the frontend to easily map settings to their respective cities or countries. For City Admins, the array will typically contain only their specific city settings (or a fallback).
 
 **Response (200 - Owner):**
 ```json
@@ -336,25 +336,52 @@ Authorization: Bearer <accessToken>
       "cityId": null
     },
     "permissions": {
-      "canManageCountries": true,
-      "canManageCities": true,
-      "canManageSettings": true,
-      "role": "owner"
+      "role": "owner",
+      "isScopeOwner": true,
+      "scope": {
+        "level": "global",
+        "countryId": null,
+        "cityId": null
+      },
+      "modules": {
+        "countries": { "view": true, "manage": true },
+        "cities": { "view": true, "manage": true },
+        "categories": { "view": true, "manage": true },
+        "settings": { "view": true, "manage": true },
+        ...
+      }
     },
     "data": {
       "countries": [
-        { "id": "...", "name": { "en": "UAE" }, "phoneCode": "+971", ... }
+        { "id": "country-uae-id", "name": { "en": "UAE" }, "phoneCode": "+971" }
       ],
       "cities": [
-        { "id": "...", "name": { "en": "Dubai" }, "countryId": "...", ... }
+        { "id": "city-dubai-id", "name": { "en": "Dubai" }, "countryId": "country-uae-id" }
       ],
       "settings": [
         {
-          "id": "...",
-          "availableLanguages": ["en", "ar"],
+          "id": "global-settings-id",
+          "cityId": null,
+          "countryId": null,
+          "availableLanguages": ["en", "fr"],
           "defaultLanguage": "en",
-          "cityId": "...",
-          ...
+          "coinRewardsEnabled": true
+        },
+        {
+          "id": "uae-settings-id",
+          "cityId": null,
+          "countryId": "country-uae-id",
+          "availableLanguages": ["en", "ar"],
+          "defaultLanguage": "ar",
+          "coinRewardsEnabled": true
+        },
+        {
+          "id": "dubai-settings-id",
+          "cityId": "city-dubai-id",
+          "countryId": "country-uae-id",
+          "availableLanguages": ["en", "ar", "ru"],
+          "defaultLanguage": "en",
+          "coinRewardsEnabled": false
         }
       ]
     }
@@ -368,33 +395,29 @@ Authorization: Bearer <accessToken>
   "success": true,
   "message": "Administrative context retrieved successfully",
   "data": {
-    "user": {
-      "id": "...",
-      "email": "cityadmin@example.com",
-      "role": "city_admin",
-      "countryId": "...",
-      "cityId": "..."
-    },
+    "user": { ... },
     "permissions": {
-      "canManageCountries": false,
-      "canManageCities": false,
-      "canManageSettings": true,
-      "role": "city_admin"
-    },
-    "data": {
-      "countries": [
-        { "id": "...", "name": { "en": "UAE" }, ... }
-      ],
-      "cities": [
-        { "id": "...", "name": { "en": "Dubai" }, ... }
-      ],
-      "settings": {
-        "id": "...",
-        "availableLanguages": ["en", "ar"],
-        "defaultLanguage": "en",
-        "cityId": "...",
+      "role": "city_admin",
+      "isScopeOwner": true,
+      "scope": {
+        "level": "city",
+        "countryId": "...",
+        "cityId": "..."
+      },
+      "modules": {
+        "countries": { "view": true, "manage": false },
+        "cities": { "view": true, "manage": true },
+        "categories": { "view": true, "manage": true },
+        "settings": { "view": true, "manage": true },
         ...
       }
+    },
+    "data": {
+      "countries": [...],
+      "cities": [...],
+      "settings": [
+        { "id": "...", "cityId": "...", "countryId": "...", ... }
+      ]
     }
   }
 }

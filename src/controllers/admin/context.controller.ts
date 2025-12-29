@@ -31,12 +31,41 @@ export class AdministrativeContextController {
             ? (requestedCityId || admin.cityId)
             : admin.cityId;
 
-        // Permissions flags based on role
-        const permissions = {
-            canManageCountries: role === 'owner',
-            canManageCities: role === 'owner' || role === 'country_admin',
-            canManageSettings: role === 'owner' || role === 'country_admin' || role === 'city_admin',
+        // Helper to check role access
+        const is = (roles: string[]) => roles.includes(role);
+        const isOwner = role === 'owner';
+        const isCountryAdmin = role === 'country_admin';
+        const isCityAdmin = role === 'city_admin';
+
+        // Simplified, broad permissions mapping
+        const permissions: any = {
             role,
+            isScopeOwner: is(['owner', 'country_admin', 'city_admin']),
+            scope: {
+                level: isOwner ? 'global' : (isCountryAdmin ? 'country' : (isCityAdmin ? 'city' : 'other')),
+                countryId: admin.countryId,
+                cityId: admin.cityId,
+            },
+            // Module-level capabilities (Broadly enabled for all "owners" of their scope)
+            modules: {
+                countries: { view: true, manage: isOwner },
+                cities: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                admins: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                categories: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                sections: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                banners: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                stores: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                drivers: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                users: { view: true, manage: is(['owner', 'country_admin', 'city_admin', 'support']) },
+                orders: { view: true, manage: true },
+                promoCodes: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                promotions: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                settings: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                support: { view: true, manage: true },
+                notifications: { view: true, manage: is(['owner', 'country_admin', 'city_admin']) },
+                auditLogs: { view: isOwner, manage: false },
+                financial: { view: true, manage: is(['owner', 'finance', 'country_admin', 'city_admin']) }
+            }
         };
 
         const contextData: any = {
@@ -51,22 +80,23 @@ export class AdministrativeContextController {
             data: {
                 countries: [],
                 cities: [],
-                settings: null,
+                settings: [],
             },
         };
 
         try {
             // Fetch settings based on role/scope
-            let settingsData: any;
-            if (role === 'owner') {
+            let settingsData: any[] = [];
+            if (isOwner) {
                 settingsData = await SettingsService.list({});
-            } else if (role === 'country_admin' && admin.countryId) {
+            } else if (isCountryAdmin && admin.countryId) {
                 settingsData = await SettingsService.list({ countryId: admin.countryId });
             } else {
-                settingsData = await SettingsService.getForScope(cityId || undefined, countryId || undefined);
+                const setting = await SettingsService.getForScope(cityId || undefined, countryId || undefined);
+                settingsData = setting ? [setting] : [];
             }
 
-            if (role === 'owner' && !requestedCityId && !requestedCountryId) {
+            if (isOwner && !requestedCityId && !requestedCountryId) {
                 // Owners get everything by default
                 const [countriesResult, citiesResult] = await Promise.all([
                     CountryService.list({ limit: 1000 }),
@@ -76,7 +106,7 @@ export class AdministrativeContextController {
                 contextData.data.cities = citiesResult.data;
                 contextData.data.settings = settingsData;
             } else if (cityId) {
-                // Specific city context (either city admin or owner/country_admin requested a city)
+                // Specific city context
                 const [city, country] = await Promise.all([
                     CityService.getById(cityId),
                     countryId ? CountryService.getById(countryId) : Promise.resolve(null),
