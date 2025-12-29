@@ -21,7 +21,7 @@ const updateDriverSchema = z.object({
     username: z.string().min(2).optional(),
     email: z.string().email().optional(),
     phone: z.string().min(5).optional(),
-    avatar: z.string().url().optional(),
+    avatar: z.string().url().nullable().optional(),
     vehicleType: z.enum(vehicleTypes).optional(),
     vehiclePlate: z.string().optional(),
     zoneId: z.string().uuid().nullable().optional(),

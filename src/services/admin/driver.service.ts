@@ -21,7 +21,7 @@ export interface UpdateDriverInput {
     username?: string;
     email?: string; // Usually sensitive to change
     phone?: string;
-    avatar?: string;
+    avatar?: string | null;
     vehicleType?: VehicleType;
     vehiclePlate?: string;
     zoneId?: string | null;

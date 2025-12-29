@@ -18,7 +18,7 @@ export interface UpdateCountryInput {
     currency?: string;
     currencyCode?: string;
     currencySymbol?: string;
-    avatar?: string;
+    avatar?: string | null;
     isActive?: boolean;
 }
 

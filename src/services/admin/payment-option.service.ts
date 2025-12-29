@@ -5,7 +5,7 @@ import type { PaymentOption, NewPaymentOption } from '../../db/schema/payment-op
 export interface CreatePaymentOptionInput {
     name: string;
     description?: string;
-    avatar?: string;
+    avatar?: string | null;
     gateway?: string;
     fee?: string;
     feeType?: 'fixed' | 'percent';

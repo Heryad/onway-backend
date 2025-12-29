@@ -21,7 +21,7 @@ export interface UpdateAdminInput {
     email?: string;
     password?: string;
     role?: AdminRole;
-    avatar?: string;
+    avatar?: string | null;
     countryId?: string | null;
     cityId?: string | null;
     isActive?: boolean;

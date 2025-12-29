@@ -16,7 +16,7 @@ const createSectionSchema = z.object({
 const updateSectionSchema = z.object({
     name: z.record(z.string(), z.string()).optional(),
     description: z.record(z.string(), z.string()).optional(),
-    avatar: z.string().url().optional(),
+    avatar: z.string().url().nullable().optional(),
     sorting: z.number().int().optional(),
     comingSoon: z.boolean().optional(),
     isActive: z.boolean().optional(),

@@ -18,7 +18,7 @@ const updateCountrySchema = z.object({
     currency: z.string().min(1).max(50).optional(),
     currencyCode: z.string().min(1).max(10).optional(),
     currencySymbol: z.string().min(1).max(10).optional(),
-    avatar: z.string().url().optional(),
+    avatar: z.string().url().nullable().optional(),
     isActive: z.boolean().optional(),
 });
 

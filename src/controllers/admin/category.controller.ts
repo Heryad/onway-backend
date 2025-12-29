@@ -15,7 +15,7 @@ const createCategorySchema = z.object({
 const updateCategorySchema = z.object({
     name: z.record(z.string(), z.string()).optional(),
     description: z.record(z.string(), z.string()).optional(),
-    avatar: z.string().url().optional(),
+    avatar: z.string().url().nullable().optional(),
     sorting: z.number().int().optional(),
     isActive: z.boolean().optional(),
 });

@@ -15,7 +15,7 @@ export interface CreateCategoryInput {
 export interface UpdateCategoryInput {
     name?: Record<string, string>;
     description?: Record<string, string>;
-    avatar?: string;
+    avatar?: string | null;
     sorting?: number;
     isActive?: boolean;
 }

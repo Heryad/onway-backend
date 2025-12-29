@@ -21,7 +21,7 @@ const updateAdminSchema = z.object({
     email: z.string().email().optional(),
     password: z.string().min(8).optional(),
     role: z.enum(adminRoles).optional(),
-    avatar: z.string().url().optional(),
+    avatar: z.string().url().nullable().optional(),
     countryId: z.string().uuid().optional(),
     cityId: z.string().uuid().optional(),
     isActive: z.boolean().optional(),

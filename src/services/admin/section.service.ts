@@ -16,7 +16,7 @@ export interface CreateSectionInput {
 export interface UpdateSectionInput {
     name?: Record<string, string>;
     description?: Record<string, string>;
-    avatar?: string;
+    avatar?: string | null;
     sorting?: number;
     comingSoon?: boolean;
     isActive?: boolean;

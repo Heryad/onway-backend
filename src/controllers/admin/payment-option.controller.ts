@@ -6,7 +6,7 @@ import { ApiResponse } from '../../lib';
 const createPaymentOptionSchema = z.object({
     name: z.string().min(2),
     description: z.string().optional(),
-    avatar: z.string().optional(),
+    avatar: z.string().nullable().optional(),
     gateway: z.string().optional(),
     fee: z.string().default('0'),
     feeType: z.enum(['fixed', 'percent']).default('fixed'),
