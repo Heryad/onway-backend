@@ -5,6 +5,7 @@ const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     // Fix: Move default before transform, or allow coercion
     PORT: z.string().default('3000').transform(Number),
+    SOCKET_PORT: z.string().default('3008').transform(Number),
     API_VERSION: z.string().default('v1'),
     API_PREFIX: z.string().default('/api/v1'),
 

@@ -83,8 +83,8 @@ initSocketServer(httpServer).catch(err => {
 });
 
 // Start HTTP server for Socket.io on same port
-httpServer.listen(config.PORT + 1, () => {
-    logger.info(`🔌 Socket.io server on port ${config.PORT + 1}`);
+httpServer.listen(config.SOCKET_PORT, () => {
+    logger.info(`🔌 Socket.io server on port ${config.SOCKET_PORT}`);
 });
 
 export default {
