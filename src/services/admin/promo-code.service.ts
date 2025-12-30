@@ -128,8 +128,11 @@ export class PromoCodeService {
         const conditions: SQL[] = [];
         const now = new Date();
 
-        if (cityId) conditions.push(eq(promoCodes.cityId, cityId));
-        if (countryId) conditions.push(eq(promoCodes.countryId, countryId));
+        if (cityId) {
+            conditions.push(eq(promoCodes.cityId, cityId));
+        } else if (countryId) {
+            conditions.push(eq(promoCodes.countryId, countryId));
+        }
         if (isActive !== undefined) conditions.push(eq(promoCodes.isActive, isActive));
         if (discountType) conditions.push(eq(promoCodes.discountType, discountType));
 
