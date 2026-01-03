@@ -1258,6 +1258,7 @@ List categories.
 
 | Param | Type | Description |
 |-------|------|-------------|
+| sectionId | uuid | Filter by section |
 | cityId | uuid | Filter by city |
 | countryId | uuid | Filter by country |
 | search | string | Search by name |
@@ -1277,9 +1278,11 @@ List categories.
       "description": { "en": "Food delivery", "ar": "توصيل الطعام" },
       "avatar": "https://example.com/restaurant.png",
       "sorting": 1,
+      "sectionId": "...",
       "cityId": "...",
       "countryId": "...",
-      "isActive": true
+      "isActive": true,
+      "section": { "id": "...", "name": { "en": "Food Delivery" } }
     }
   ]
 }
@@ -1298,6 +1301,7 @@ Create category.
   "description": { "en": "Food delivery" },
   "avatar": "https://example.com/restaurant.png",
   "sorting": 1,
+  "sectionId": "...",
   "cityId": "...",
   "countryId": "..."
 }
@@ -2485,16 +2489,17 @@ List stores.
 
 | Param | Type | Description |
 |-------|------|-------------|
+| sectionId | uuid | Filter by section |
 | cityId | uuid | Filter by city |
 | countryId | uuid | Filter by country |
 | search | string | Search by name |
 | isActive | boolean | Filter by status |
-| isPrime | boolean | Filter prime stores |
-| isSponsored | boolean | Filter sponsored |
-| isFeatured | boolean | Filter featured |
+| isPrime | boolean | Filter prime only |
+| isSponsored | boolean | Filter sponsored only |
+| isFeatured | boolean | Filter featured only |
 | page | number | Page (default: 1) |
 | limit | number | Per page (default: 20) |
-| sortBy | string | `createdAt`, `rating`, `sorting` |
+| sortBy | string | `createdAt`, `name`, `rating`, `sorting` |
 | sortOrder | string | `asc`, `desc` |
 
 **Response (200):**
@@ -2514,8 +2519,10 @@ List stores.
       "isSponsored": false,
       "isFeatured": true,
       "isActive": true,
+      "sectionId": "...",
       "city": { "id": "...", "name": { "en": "Dubai" } },
-      "country": { "id": "...", "name": { "en": "UAE" } }
+      "country": { "id": "...", "name": { "en": "UAE" } },
+      "section": { "id": "...", "name": { "en": "Food Delivery" } }
     }
   ]
 }
@@ -2563,7 +2570,9 @@ Get store with auth users.
     "commissionRate": "15.00",
     "cityId": "...",
     "countryId": "...",
+    "sectionId": "...",
     "isActive": true,
+    "section": { "id": "...", "name": { "en": "Food Delivery" } },
     "auth": [
       {
         "id": "...",
@@ -2592,6 +2601,7 @@ Create store with owner credentials.
   "avatar": "https://example.com/logo.png",
   "cityId": "...",
   "countryId": "...",
+  "sectionId": "...",
   "auth": {
     "username": "pizzapalace",
     "email": "owner@pizzapalace.com",
@@ -2627,6 +2637,7 @@ Create store with owner credentials.
 | preparationTime | ❌ | Minutes (default: 30) |
 | geoLocation | ❌ | `{ lat, lng }` |
 | address | ❌ | Street address |
+| sectionId | ❌ | Primary Section UUID |
 | commissionRate | ❌ | Platform commission % |
 
 ---

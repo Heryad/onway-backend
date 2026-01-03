@@ -2,6 +2,8 @@ import { pgTable, uuid, jsonb, varchar, boolean, timestamp, integer, index } fro
 import { relations } from "drizzle-orm";
 import { countries } from "./countries";
 import { cities } from "./cities";
+import { categories } from "./categories";
+import { stores } from "./stores";
 
 /**
  * Sections Table
@@ -33,7 +35,9 @@ export const sections = pgTable("sections", {
 ]);
 
 // Relations
-export const sectionsRelations = relations(sections, ({ one }) => ({
+export const sectionsRelations = relations(sections, ({ one, many }) => ({
+    categories: many(categories),
+    stores: many(stores),
     city: one(cities, {
         fields: [sections.cityId],
         references: [cities.id],

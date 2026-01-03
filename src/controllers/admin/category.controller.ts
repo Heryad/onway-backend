@@ -8,6 +8,7 @@ const createCategorySchema = z.object({
     description: z.record(z.string(), z.string()).optional(),
     avatar: z.string().url().optional(),
     sorting: z.number().int().optional(),
+    sectionId: z.string().uuid().optional(),
     cityId: z.string().uuid().optional(),
     countryId: z.string().uuid().optional(),
 });
@@ -17,10 +18,12 @@ const updateCategorySchema = z.object({
     description: z.record(z.string(), z.string()).optional(),
     avatar: z.string().url().nullable().optional(),
     sorting: z.number().int().optional(),
+    sectionId: z.string().uuid().nullable().optional(),
     isActive: z.boolean().optional(),
 });
 
 const listCategoriesSchema = z.object({
+    sectionId: z.string().uuid().optional(),
     cityId: z.string().uuid().optional(),
     countryId: z.string().uuid().optional(),
     search: z.string().optional(),

@@ -47,6 +47,7 @@ const createStoreSchema = z.object({
     canPlaceOrder: z.boolean().optional(),
     acceptsScheduledOrders: z.boolean().optional(),
     commissionRate: z.string().optional(),
+    sectionId: z.string().uuid().optional(),
 
     cityId: z.string().uuid(),
     countryId: z.string().uuid(),
@@ -90,6 +91,7 @@ const updateStoreSchema = z.object({
     canPlaceOrder: z.boolean().optional(),
     acceptsScheduledOrders: z.boolean().optional(),
     commissionRate: z.string().optional(),
+    sectionId: z.string().uuid().nullable().optional(),
     isActive: z.boolean().optional(),
 });
 
@@ -102,6 +104,7 @@ const listStoresSchema = z.object({
     isPrime: z.enum(['true', 'false']).transform(v => v === 'true').optional(),
     isSponsored: z.enum(['true', 'false']).transform(v => v === 'true').optional(),
     isFeatured: z.enum(['true', 'false']).transform(v => v === 'true').optional(),
+    sectionId: z.string().uuid().optional(),
     page: z.coerce.number().default(1),
     limit: z.coerce.number().default(20),
     sortBy: z.enum(['createdAt', 'name', 'rating', 'sorting']).default('createdAt'),

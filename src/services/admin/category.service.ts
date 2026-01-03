@@ -8,6 +8,7 @@ export interface CreateCategoryInput {
     description?: Record<string, string>;
     avatar?: string;
     sorting?: number;
+    sectionId?: string;
     cityId?: string;
     countryId?: string;
 }
@@ -17,10 +18,12 @@ export interface UpdateCategoryInput {
     description?: Record<string, string>;
     avatar?: string | null;
     sorting?: number;
+    sectionId?: string | null;
     isActive?: boolean;
 }
 
 export interface ListCategoriesFilters {
+    sectionId?: string;
     cityId?: string;
     countryId?: string;
     isActive?: boolean;
@@ -37,6 +40,7 @@ export class CategoryService {
             description: input.description,
             avatar: input.avatar,
             sorting: input.sorting ?? 0,
+            sectionId: input.sectionId,
             cityId: input.cityId,
             countryId: input.countryId,
         }).returning();
@@ -48,7 +52,7 @@ export class CategoryService {
     static async getById(id: string): Promise<Category | null> {
         const category = await db.query.categories.findFirst({
             where: eq(categories.id, id),
-            with: { city: true, country: true },
+            with: { city: true, country: true, section: true },
         });
         return category ?? null;
     }
@@ -60,6 +64,7 @@ export class CategoryService {
         if (input.description !== undefined) updateData.description = input.description;
         if (input.avatar !== undefined) updateData.avatar = input.avatar;
         if (input.sorting !== undefined) updateData.sorting = input.sorting;
+        if (input.sectionId !== undefined) updateData.sectionId = input.sectionId;
         if (input.isActive !== undefined) updateData.isActive = input.isActive;
 
         const [category] = await db.update(categories)
@@ -87,6 +92,7 @@ export class CategoryService {
 
     static async list(filters: ListCategoriesFilters = {}): Promise<{ data: Category[]; total: number }> {
         const {
+            sectionId,
             cityId,
             countryId,
             isActive,
@@ -98,6 +104,7 @@ export class CategoryService {
 
         const conditions: SQL[] = [];
 
+        if (sectionId) conditions.push(eq(categories.sectionId, sectionId));
         if (cityId) conditions.push(eq(categories.cityId, cityId));
         if (countryId) conditions.push(eq(categories.countryId, countryId));
         if (isActive !== undefined) conditions.push(eq(categories.isActive, isActive));
@@ -108,7 +115,7 @@ export class CategoryService {
         const [data, countResult] = await Promise.all([
             db.query.categories.findMany({
                 where: whereClause,
-                with: { city: true, country: true },
+                with: { city: true, country: true, section: true },
                 orderBy: [orderFn(categories.sorting), orderFn(categories.createdAt)],
                 limit,
                 offset: (page - 1) * limit,

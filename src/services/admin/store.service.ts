@@ -51,6 +51,7 @@ export interface CreateStoreInput {
     // Required
     cityId: string;
     countryId: string;
+    sectionId?: string;
 
     // Auth credentials for store owner
     auth: {
@@ -86,6 +87,7 @@ export interface UpdateStoreInput {
     canPlaceOrder?: boolean;
     acceptsScheduledOrders?: boolean;
     commissionRate?: string;
+    sectionId?: string | null;
     isActive?: boolean;
 }
 
@@ -97,6 +99,7 @@ export interface ListStoresFilters {
     isPrime?: boolean;
     isSponsored?: boolean;
     isFeatured?: boolean;
+    sectionId?: string;
     search?: string;
     page?: number;
     limit?: number;
@@ -143,6 +146,7 @@ export class StoreService {
                 commissionRate: input.commissionRate ?? '15.00',
                 cityId: input.cityId,
                 countryId: input.countryId,
+                sectionId: input.sectionId,
             }).returning();
 
             // Create store auth
@@ -171,6 +175,7 @@ export class StoreService {
             with: {
                 city: true,
                 country: true,
+                section: true,
             },
         });
 
@@ -213,6 +218,7 @@ export class StoreService {
         if (input.canPlaceOrder !== undefined) updateData.canPlaceOrder = input.canPlaceOrder;
         if (input.acceptsScheduledOrders !== undefined) updateData.acceptsScheduledOrders = input.acceptsScheduledOrders;
         if (input.commissionRate !== undefined) updateData.commissionRate = input.commissionRate;
+        if (input.sectionId !== undefined) updateData.sectionId = input.sectionId;
         if (input.isActive !== undefined) updateData.isActive = input.isActive;
 
         const [store] = await db.update(stores)
@@ -248,6 +254,7 @@ export class StoreService {
             isPrime,
             isSponsored,
             isFeatured,
+            sectionId,
             search,
             page = 1,
             limit = 20,
@@ -263,6 +270,7 @@ export class StoreService {
         if (isPrime !== undefined) conditions.push(eq(stores.isPrime, isPrime));
         if (isSponsored !== undefined) conditions.push(eq(stores.isSponsored, isSponsored));
         if (isFeatured !== undefined) conditions.push(eq(stores.isFeatured, isFeatured));
+        if (sectionId) conditions.push(eq(stores.sectionId, sectionId));
 
         const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
         const orderFn = sortOrder === 'asc' ? asc : desc;
@@ -272,7 +280,7 @@ export class StoreService {
         const [data, countResult] = await Promise.all([
             db.query.stores.findMany({
                 where: whereClause,
-                with: { city: true, country: true },
+                with: { city: true, country: true, section: true },
                 orderBy: orderFn(sortColumn),
                 limit,
                 offset: (page - 1) * limit,
