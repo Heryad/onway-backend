@@ -27,6 +27,7 @@ import { settingsRoutes } from './settings.routes';
 import { paymentRoutes } from './payment.routes';
 import { notificationRoutes } from './notification.routes';
 import { auditRoutes } from './audit.routes';
+import { analyticsRoutes } from './analytics.routes';
 
 const adminRoutes = new Hono();
 
@@ -93,5 +94,8 @@ adminRoutes.route('/notifications', notificationRoutes);
 
 // Audit Logs
 adminRoutes.route('/audit-logs', auditRoutes);
+
+// Analytics
+adminRoutes.route('/analytics', analyticsRoutes);
 
 export { adminRoutes };

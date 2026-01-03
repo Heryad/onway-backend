@@ -113,6 +113,8 @@
   - [Get Log](#get-id--20)
   - [Record History](#get-recordtablerecordid)
   - [Admin Activity](#get-adminadminid)
+- [Analytics](#analytics)
+  - [Get Analytics](#get---21)
 - [Stores](#stores)
   - [List Stores](#get---7)
   - [Get Store](#get-id--7)
@@ -3198,6 +3200,422 @@ Manual generation.
 ### PATCH `/:id/process` 🔒
 
 Mark as Paid or Failed.
+
+
+---
+
+## Analytics
+
+**Base URL:** `/api/v1/admin/analytics`
+
+**Access:** `owner`, `country_admin`, `city_admin`, `support` (geo filtered based on role)
+
+The analytics endpoint provides comprehensive business intelligence data aggregated across all database tables. Data is filtered based on admin role and geographic scope:
+
+- **Owner**: Can view analytics for any country/city or globally
+- **Country Admin**: Can view analytics for their country or specific cities within it
+- **City Admin**: Can only view analytics for their assigned city
+
+---
+
+### GET `/` 🔒
+
+Get comprehensive analytics data for a specified date range.
+
+**Headers:**
+```
+Authorization: Bearer <accessToken>
+```
+
+**Query Parameters:**
+
+| Param | Type | Required | Description |
+|-------|------|----------|-------------|
+| startDate | string | Yes | Start date (YYYY-MM-DD format) |
+| endDate | string | Yes | End date (YYYY-MM-DD format) |
+| countryId | uuid | No | Filter by country (owner only) |
+| cityId | uuid | No | Filter by city (owner/country admin) |
+
+**Validation Rules:**
+- Date format must be `YYYY-MM-DD`
+- Start date must be before or equal to end date
+- Date range cannot exceed 1 year
+- City admins cannot override their assigned city
+- Country admins cannot override their assigned country
+
+**Response (200 - Owner viewing global data):**
+```json
+{
+  "success": true,
+  "message": "Analytics retrieved successfully",
+  "data": {
+    "period": {
+      "startDate": "2026-01-01",
+      "endDate": "2026-01-31"
+    },
+    "orders": {
+      "totalOrders": 1250,
+      "completedOrders": 1100,
+      "cancelledOrders": 80,
+      "pendingOrders": 70,
+      "avgOrderValue": 85.50,
+      "totalOrderValue": 106875.00
+    },
+    "revenue": {
+      "totalRevenue": 94050.00,
+      "totalSubtotal": 82500.00,
+      "totalDeliveryFees": 5500.00,
+      "totalServiceFees": 3300.00,
+      "totalTaxAmount": 4125.00,
+      "totalTips": 2200.00,
+      "totalDiscounts": 3575.00
+    },
+    "users": {
+      "newUsers": 350,
+      "totalUsers": 5420,
+      "primeUsers": 450
+    },
+    "stores": {
+      "totalStores": 120,
+      "activeStores": 115,
+      "primeStores": 35,
+      "sponsoredStores": 15,
+      "featuredStores": 25,
+      "avgRating": 4.6
+    },
+    "drivers": {
+      "totalDrivers": 250,
+      "activeDrivers": 230,
+      "onlineDrivers": 45,
+      "avgRating": 4.7
+    },
+    "payments": {
+      "totalPayments": 1250,
+      "completedPayments": 1180,
+      "failedPayments": 50,
+      "refundedPayments": 20,
+      "totalAmount": 94050.00,
+      "totalRefunded": 1890.00
+    },
+    "reviews": {
+      "totalReviews": 580,
+      "storeReviews": 420,
+      "driverReviews": 160,
+      "approvedReviews": 550,
+      "avgRating": 4.5,
+      "rating5": 340,
+      "rating4": 185,
+      "rating3": 40,
+      "rating2": 10,
+      "rating1": 5
+    },
+    "support": {
+      "totalTickets": 85,
+      "openTickets": 12,
+      "inProgressTickets": 18,
+      "resolvedTickets": 50,
+      "closedTickets": 5
+    },
+    "promoCodes": {
+      "totalUsed": 180,
+      "totalDiscount": 5400.00
+    },
+    "transactions": {
+      "totalTransactions": 420,
+      "completedTransactions": 410,
+      "totalAmount": 12600.00
+    },
+    "performance": {
+      "categories": [
+        {
+          "id": "cat-food-id",
+          "name": { "en": "Food", "ar": "طعام" },
+          "totalOrders": 850
+        }
+      ],
+      "sections": [
+        {
+          "id": "sec-restaurants-id",
+          "name": { "en": "Restaurants", "ar": "مطاعم" },
+          "totalOrders": 920,
+          "totalRevenue": 78540.00
+        }
+      ],
+      "topStores": [
+        {
+          "id": "store-123",
+          "name": { "en": "Pizza Palace", "ar": "قصر البيتزا" },
+          "avatar": "https://cdn.example.com/pizza-palace.jpg",
+          "totalOrders": 145,
+          "totalRevenue": 12325.00,
+          "avgOrderValue": 85.00
+        },
+        {
+          "id": "store-456",
+          "name": { "en": "Burger King", "ar": "برجر كينج" },
+          "avatar": "https://cdn.example.com/burger-king.jpg",
+          "totalOrders": 132,
+          "totalRevenue": 9900.00,
+          "avgOrderValue": 75.00
+        }
+      ],
+      "topDrivers": [
+        {
+          "id": "driver-789",
+          "username": "ahmed_driver",
+          "avatar": "https://cdn.example.com/ahmed.jpg",
+          "vehicleType": "bike",
+          "totalDeliveries": 450,
+          "rating": "4.9"
+        },
+        {
+          "id": "driver-101",
+          "username": "sara_driver",
+          "avatar": "https://cdn.example.com/sara.jpg",
+          "vehicleType": "motor",
+          "totalDeliveries": 428,
+          "rating": "4.8"
+        }
+      ]
+    },
+    "breakdowns": {
+      "orderStatus": [
+        {
+          "status": "delivered",
+          "count": 1100,
+          "totalValue": 94050.00
+        },
+        {
+          "status": "cancelled",
+          "count": 80,
+          "totalValue": 6800.00
+        },
+        {
+          "status": "pending",
+          "count": 35,
+          "totalValue": 2975.00
+        },
+        {
+          "status": "preparing",
+          "count": 20,
+          "totalValue": 1700.00
+        },
+        {
+          "status": "driver_assigned",
+          "count": 15,
+          "totalValue": 1350.00
+        }
+      ],
+      "paymentMethods": [
+        {
+          "paymentMethod": "card",
+          "count": 780,
+          "totalValue": 66690.00
+        },
+        {
+          "paymentMethod": "cash",
+          "count": 250,
+          "totalValue": 21375.00
+        },
+        {
+          "paymentMethod": "wallet",
+          "count": 50,
+          "totalValue": 4275.00
+        },
+        {
+          "paymentMethod": "apple_pay",
+          "count": 15,
+          "totalValue": 1282.50
+        },
+        {
+          "paymentMethod": "google_pay",
+          "count": 5,
+          "totalValue": 427.50
+        }
+      ]
+    },
+    "trends": {
+      "daily": [
+        {
+          "date": "2026-01-01",
+          "totalOrders": 42,
+          "completedOrders": 38,
+          "totalRevenue": 3249.00,
+          "avgOrderValue": 85.50
+        },
+        {
+          "date": "2026-01-02",
+          "totalOrders": 45,
+          "completedOrders": 41,
+          "totalRevenue": 3505.50,
+          "avgOrderValue": 85.50
+        },
+        {
+          "date": "2026-01-03",
+          "totalOrders": 38,
+          "completedOrders": 35,
+          "totalRevenue": 2992.50,
+          "avgOrderValue": 85.50
+        }
+      ]
+    }
+  },
+  "timestamp": "2026-01-03T18:55:00.000Z"
+}
+```
+
+**Response (200 - City Admin):**
+```json
+{
+  "success": true,
+  "message": "Analytics retrieved successfully",
+  "data": {
+    "period": {
+      "startDate": "2026-01-01",
+      "endDate": "2026-01-31",
+      "cityId": "city-dubai-id",
+      "countryId": "country-uae-id"
+    },
+    "orders": {
+      "totalOrders": 520,
+      "completedOrders": 485,
+      "cancelledOrders": 25,
+      "pendingOrders": 10,
+      "avgOrderValue": 92.00,
+      "totalOrderValue": 47840.00
+    },
+    "revenue": {
+      "totalRevenue": 44620.00,
+      "totalSubtotal": 39100.00,
+      "totalDeliveryFees": 2600.00,
+      "totalServiceFees": 1560.00,
+      "totalTaxAmount": 1955.00,
+      "totalTips": 1300.00,
+      "totalDiscounts": 1895.00
+    },
+    "users": {
+      "newUsers": 145,
+      "totalUsers": 2340,
+      "primeUsers": 285
+    },
+    "stores": {
+      "totalStores": 48,
+      "activeStores": 46,
+      "primeStores": 18,
+      "sponsoredStores": 8,
+      "featuredStores": 12,
+      "avgRating": 4.7
+    },
+    "drivers": {
+      "totalDrivers": 95,
+      "activeDrivers": 88,
+      "onlineDrivers": 22,
+      "avgRating": 4.8
+    }
+    // ... rest of analytics filtered for this city
+  },
+  "timestamp": "2026-01-03T18:55:00.000Z"
+}
+```
+
+**Response (400):**
+```json
+{
+  "success": false,
+  "message": "Start date must be before end date",
+  "timestamp": "2026-01-03T18:55:00.000Z"
+}
+```
+
+**Response (400):**
+```json
+{
+  "success": false,
+  "message": "Date range cannot exceed 1 year",
+  "timestamp": "2026-01-03T18:55:00.000Z"
+}
+```
+
+**Response (403):**
+```json
+{
+  "success": false,
+  "message": "Access denied to this geographic region",
+  "timestamp": "2026-01-03T18:55:00.000Z"
+}
+```
+
+**Response (422):**
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": {
+    "startDate": ["Invalid date format. Use YYYY-MM-DD"],
+    "endDate": ["Required"]
+  },
+  "timestamp": "2026-01-03T18:55:00.000Z"
+}
+```
+
+---
+
+**Analytics Data Categories:**
+
+1. **Orders**: Total, completed, cancelled, pending orders with value metrics
+2. **Revenue**: Breakdown of all revenue components (subtotal, fees, taxes, tips, discounts)
+3. **Users**: New users, total users, prime membership stats
+4. **Stores**: Store counts by type (active, prime, sponsored, featured) with average rating
+5. **Drivers**: Driver counts by status (total, active, online) with average rating
+6. **Payments**: Payment transaction stats including refunds
+7. **Reviews**: Review statistics with rating distribution
+8. **Support**: Support ticket status breakdown
+9. **Promo Codes**: Promo code usage and discount totals
+10. **Transactions**: Coin transaction statistics
+11. **Performance**:
+    - **Categories**: Order counts by category
+    - **Sections**: Orders and revenue by section
+    - **Top Stores**: Top 10 performing stores
+    - **Top Drivers**: Top 10 drivers by deliveries
+12. **Breakdowns**:
+    - **Order Status**: Distribution by order status
+    - **Payment Methods**: Distribution by payment method
+13. **Trends**:
+    - **Daily**: Day-by-day metrics for the selected period
+
+---
+
+**Example Use Cases:**
+
+**Owner viewing global analytics:**
+```
+GET /api/v1/admin/analytics?startDate=2026-01-01&endDate=2026-01-31
+```
+
+**Owner viewing specific country:**
+```
+GET /api/v1/admin/analytics?startDate=2026-01-01&endDate=2026-01-31&countryId=country-uae-id
+```
+
+**Owner viewing specific city:**
+```
+GET /api/v1/admin/analytics?startDate=2026-01-01&endDate=2026-01-31&cityId=city-dubai-id
+```
+
+**Country admin viewing their country:**
+```
+GET /api/v1/admin/analytics?startDate=2026-01-01&endDate=2026-01-31
+```
+
+**Country admin viewing specific city in their country:**
+```
+GET /api/v1/admin/analytics?startDate=2026-01-01&endDate=2026-01-31&cityId=city-dubai-id
+```
+
+**City admin viewing their city (cityId is automatically enforced):**
+```
+GET /api/v1/admin/analytics?startDate=2026-01-01&endDate=2026-01-31
+```
 
 ---
 
